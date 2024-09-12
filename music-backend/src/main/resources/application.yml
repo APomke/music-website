@@ -1,0 +1,22 @@
+server:
+  port: 8081 # 设置项目启动端口
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # 排除DataSource自动配置
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/template?serverTimezone=UTC
+      username: root
+      password: 311252
+mybatis-plus:
+  configuration:
+    #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: ASSIGN_ID
+  # mapper 自定义mapper映射文件的路径，可以有多个
+  mapper-locations:
+      - "classpath*:mappers/**/*.xml"
