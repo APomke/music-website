@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import play from './components/play.vue'
+import play from './view/play.vue'
 
 export default {
   name: 'App',

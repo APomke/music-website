@@ -17,10 +17,12 @@
 </template>
 
 <script>
-import search_components from './search_components.vue'
-import sidebar_components from './sidebar_components.vue'
-import recommendations from './recommendations.vue'
-import progressbar from './progressbar.vue'
+
+import search_components from '../components/search_components.vue'
+import sidebar_components from '../components/sidebar_components.vue'
+import recommendations from '../components/recommendations.vue'
+import progressbar from '../components/progressbar.vue'
+
 
 export default {
     components: {
@@ -28,8 +30,11 @@ export default {
         sidebar_components,
         recommendations,
         progressbar
+    },
+    methods: {
     }
 }
+
 </script>
 
 <style scoped>
@@ -37,20 +42,6 @@ export default {
     display: flex;
     flex-direction: column;
     position: relative;
-
-    /* 搜索组件 css */
-    .layout-top {
-        
-    }
-
-    /* 左侧选项卡 css */
-    .layout-left {
-
-    }
-
-    /* 音乐推荐 css */
-    .layout-right {
-    }
 
     /* 音乐播放进度 css */
     .layout-under {
