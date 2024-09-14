@@ -30,8 +30,10 @@
                     </svg>
                 </div>
             </transition>
-            <!--进度条-->
-
+        </div>
+        <!--进度条-->
+        <div class="block">
+            <el-slider v-model="value1" :show-tooltip="false" class="jindu"></el-slider>
         </div>
     </div>
 </template>
@@ -41,6 +43,7 @@ export default {
     data() {
         return {
             playstatus: false,
+            value1: 0,
         }
     },
     // 组件的逻辑部分  
@@ -83,8 +86,10 @@ export default {
     justify-content: center;
     align-items: center;
     position: relative;
-    width: 60px; /* 确保宽度一致 */
-    height: 60px; /* 确保高度一致 */
+    width: 60px;
+    /* 确保宽度一致 */
+    height: 60px;
+    /* 确保高度一致 */
     margin: 0 auto;
 }
 
@@ -96,6 +101,7 @@ export default {
     width: 100%;
     height: 100%;
 }
+
 .p-icon {
     position: absolute;
     top: 50%;
@@ -126,5 +132,44 @@ export default {
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;
+}
+
+/*定义进度条样式*/
+.block {
+    position: absolute;
+    width: 80%;
+    bottom: -5px;
+    color: chartreuse;
+}
+
+.jindu {
+    .el-slider__button {
+        width: 10px;
+        height: 10px;
+        border: 2px solid #000000;
+        background-color: #000000;
+        border-radius: 50%;
+        transition: .2s;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+    }
+    .el-slider__runway {
+        width: 100%;
+        height: 3px;
+        margin: 16px 0;
+        background-color: #E4E7ED;
+        border-radius: 3px;
+        position: relative;
+        cursor: pointer;
+        vertical-align: middle;
+    }
+    .el-slider__bar {
+        height: 4px;
+        background-color: #000000;
+        border-top-left-radius: 3px;
+        border-bottom-left-radius: 3px;
+        position: absolute;
+    }
 }
 </style>
