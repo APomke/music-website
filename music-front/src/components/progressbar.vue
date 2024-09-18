@@ -5,7 +5,7 @@
         <div class="play-btn" @click="playbutton">
             <!--开始播放按钮-->
             <transition name="fade">
-                <div v-if="!playstatus">
+                <div v-if="!this.$store.state.playstatus">
                     <svg t="1725370962119" class="p-icon" viewBox="0 0 1024 1024" version="1.1"
                         xmlns="http://www.w3.org/2000/svg" p-id="3529" width="60" height="60">
                         <path
@@ -19,7 +19,7 @@
             </transition>
             <!--暂停播放按钮-->
             <transition name="fade">
-                <div v-if="playstatus">
+                <div v-if="this.$store.state.playstatus">
                     <svg t="1726187728687" class="p-icon" viewBox="0 0 1024 1024" version="1.1"
                         xmlns="http://www.w3.org/2000/svg" p-id="7795" width="60" height="60">
                         <path d="M512 483.4m-380 0a380 380 0 1 0 760 0 380 380 0 1 0-760 0Z" fill="#31BC69" p-id="7796">
@@ -39,24 +39,32 @@
 </template>
 
 <script>
+import recommendations from './recommendations.vue';
 export default {
     data() {
         return {
-            playstatus: false,
+            // playstatus: false,
             value1: 0,
         }
     },
     // 组件的逻辑部分  
     methods: {
         playbutton() {
-            this.playstatus = this.playstatus == true ? false : true
-            if (this.playstatus) {
-                console.log("播放")
-            } else {
-                console.log("暂停")
+            // 必须要读取到vuex里的音乐信息才能点击播放按钮
+            if (this.$store.state.music) {
+                this.$store.commit("savePlayStatus", this.$store.state.playstatus == true ? false : true);
+                // this.$store.state.playstatus = this.playstatus == true ? false : true
+                if (this.$store.state.playstatus) {
+                    console.log("播放")
+                    // console.log(this.$store.state.music.id)
+                    // 修改音乐信息
+                    this.$store.commit("updateMusicState",true)
+                } else {
+                    console.log("暂停")
+                    this.$store.commit("updateMusicState",false)
+                }
+                console.log(this.$store.state.playstatus)
             }
-            console.log(this.playstatus)
-            // 改变按钮组件
 
         }
     }
@@ -154,6 +162,7 @@ export default {
         -moz-user-select: none;
         user-select: none;
     }
+
     .el-slider__runway {
         width: 100%;
         height: 3px;
@@ -164,6 +173,7 @@ export default {
         cursor: pointer;
         vertical-align: middle;
     }
+
     .el-slider__bar {
         height: 4px;
         background-color: #000000;
