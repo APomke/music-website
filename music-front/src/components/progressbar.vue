@@ -1,6 +1,14 @@
 <template>
     <!--音乐播放进度-->
     <div class="progressbar-container">
+        <div class="time-display" v-if="this.$store.state.audio.currentTime">
+            <!--当前播放时间-->
+            <span class="current-time">{{ formatTime(this.$store.state.currentTime) }}</span>
+        </div>
+        <div class="time-display" v-if="!this.$store.state.audio.currentTime">
+            <!--当前播放时间-->
+            <span class="current-time">00:00</span>
+        </div>
         <!-- 音乐播放进度 -->
         <div class="play-btn" @click="playbutton">
             <!--开始播放按钮-->
@@ -31,26 +39,37 @@
                 </div>
             </transition>
         </div>
+        <div class="time-display" v-if="this.$store.state.audio.duration">
+            <!--音乐总时长-->
+            <span class="total-time">{{ formatTime(this.$store.state.audio.duration) }}</span>
+        </div>
+        <div class="time-display" v-if="!this.$store.state.audio.duration">
+            <!--音乐总时长-->
+            <span class="total-time">00:00</span>
+        </div>
         <!--进度条-->
         <div class="block">
-            <el-slider v-model="value1" :show-tooltip="false" class="jindu"></el-slider>
+            <el-slider v-model="$store.state.currentTime" :show-tooltip="false" class="jindu" :max="$store.state.audio.duration" @change="updateCurrentTime"></el-slider>
         </div>
     </div>
 </template>
 
 <script>
-import recommendations from './recommendations.vue';
 export default {
     data() {
         return {
             // playstatus: false,
             value1: 0,
+            currentTime: 0,
+            duration: 0
+
         }
     },
     // 组件的逻辑部分  
     methods: {
         playbutton() {
             // 必须要读取到vuex里的音乐信息才能点击播放按钮
+            console.log(this.$store.state.music)
             if (this.$store.state.music) {
                 this.$store.commit("savePlayStatus", this.$store.state.playstatus == true ? false : true);
                 // this.$store.state.playstatus = this.playstatus == true ? false : true
@@ -58,14 +77,26 @@ export default {
                     console.log("播放")
                     // console.log(this.$store.state.music.id)
                     // 修改音乐信息
-                    this.$store.commit("updateMusicState",true)
+                    this.$store.commit("updateMusicState", true)
                 } else {
                     console.log("暂停")
-                    this.$store.commit("updateMusicState",false)
+                    this.$store.commit("updateMusicState", false)
                 }
                 console.log(this.$store.state.playstatus)
             }
 
+        },
+        // 把播放时间转换为00:00的结构
+        formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secondsLeft = Math.floor(seconds % 60);
+            return `${String(minutes).padStart(2, '0')}:${String(secondsLeft).padStart(2, '0')}`;
+        },
+        updateCurrentTime(val) {
+            console.log(val)
+            // 修改音乐播放进度
+            // this.$store.state.currentTime = val;
+            this.$store.commit("saveUpdateCurrentTime",val)
         }
     }
 }  
@@ -148,7 +179,45 @@ export default {
     width: 80%;
     bottom: -5px;
     color: chartreuse;
+    margin: 0 10px;
+    /* 添加一些左右间距 */
 }
+
+/* 时间显示 */
+.time-display {
+    display: flex;
+    gap: 10px;
+    /* 添加一些间距 */
+    align-items: center;
+    font-size: 14px;
+    color: #666;
+}
+
+.time-display .current-time {
+    order: 1;
+    /* 确保当前时间在左边 */
+    margin-left: 150px; /* 左侧间距 */
+}
+
+.time-display .total-time {
+    order: 3;
+    /* 确保总时间在右边 */
+    margin-right: 150px; /* 右侧间距 */
+}
+
+.time-display span {
+    font-family: monospace;
+    font-size: 14px;
+    padding: 5px;
+    /*border: 1px solid #ddd;*/
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.time-display span:hover {
+    background-color: #e0e0e0;
+}
+
 
 .jindu {
     .el-slider__button {
@@ -180,6 +249,20 @@ export default {
         border-top-left-radius: 3px;
         border-bottom-left-radius: 3px;
         position: absolute;
+    }
+}
+/* 响应式调整 */
+@media screen and (max-width: 768px) {
+    .time-display .current-time {
+        order: 1;
+        /* 确保当前时间在左边 */
+        margin-left: 20px; /* 左侧间距 */
+    }
+    
+    .time-display .total-time {
+        order: 3;
+        /* 确保总时间在右边 */
+        margin-right: 20px; /* 右侧间距 */
     }
 }
 </style>

@@ -65,7 +65,11 @@ export default {
             ],
             audio: new Audio(require('@/music/11.稻香.wav')),
             // 记录正在播放的音乐id
-            musicid: null
+            musicid: null,
+            // 当前音乐播放时间
+            currentTime: 0,
+            // 当前播放音乐总时长
+            duration: 0,
         };
     },
     methods: {
@@ -90,6 +94,9 @@ export default {
                 this.audio.pause();
                 this.$store.commit("savePlayStatus", false);
                 this.recommendations[this.musicid ? this.recommendations.findIndex(item => item.id === this.musicid) : index].isPlaying = false;
+                // 设置播放时长
+                this.duration = this.formatTime(this.audio.duration)
+                console.log("得到初始化的时长:", this.duration)
             }
             // 改变对应的音乐卡片按钮的svg播放图标
             this.recommendations[index].isPlaying = !this.recommendations[index].isPlaying;
@@ -97,8 +104,11 @@ export default {
             if (this.recommendations[index].isPlaying) {
                 // 开始播放音频
                 // this.audio.src = require(`@/music/${id}.wav`);
+                // 根据id查询要播放音乐的url
                 // 把播放的音乐保存到vuex
                 this.$store.commit("saveMusicInfo", this.recommendations[index])
+                this.$store.commit("saveAudio",this.audio)
+
                 this.audio.play();
                 // 保存音乐id
                 this.musicid = id
@@ -108,29 +118,62 @@ export default {
             }
             // 改变进度条播放按钮样式
             this.$store.commit("savePlayStatus", this.recommendations[index].isPlaying);
-        }
+        },
+        // 把播放时间转换为00:00的结构
+        formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secondsLeft = Math.floor(seconds % 60);
+            return `${String(minutes).padStart(2, '0')}:${String(secondsLeft).padStart(2, '0')}`;
+        },
     },
     created() {
         // this.getRecommedations()
     },
     watch: {
         "$store.state.music.isPlaying": {
-            deep:true,//深度监听设置为 true
+            deep: true,//深度监听设置为 true
             handler: function (newVal, oldVal) {
-                if(newVal) {
+                if (newVal) {
                     //播放音乐
                     this.audio.play();
                     // 修改vuex里的音乐状态
-                    this.$store.commit("updateMusicState",true)
-                }else{
+                    this.$store.commit("updateMusicState", true)
+                } else {
                     //暂停音乐
                     this.audio.pause();
                     // 修改vuex里的音乐状态
-                    this.$store.commit("updateMusicState",false)
+                    this.$store.commit("updateMusicState", false)
+                }
+            }
+        },
+        "$store.state.updateCurrentTime": {
+            deep: true,
+            handler: function (newVal,oldVal) {
+                if (newVal) {
+                    // 修改音乐播放进度
+                    // console.log("修改播放进度")
+                    this.audio.currentTime = newVal
+                    this.$store.commit("saveAudio",this.audio)
                 }
             }
         }
-    }
+    },
+    mounted() {
+
+        // 监听音频播放状态变化
+        this.audio.addEventListener('timeupdate', () => {
+            this.currentTime = this.formatTime(this.audio.currentTime);
+            // 保存到vux
+            this.$store.commit("saveCurrentTime",this.audio.currentTime)
+            // console.log("当前音乐播放时间:",this.currentTime)
+        });
+
+        // 监听音频播放结束
+        this.audio.addEventListener('ended', () => {
+            console.log('音频播放结束');
+            this.currentTime = 0;
+        });
+    },
 };  
 </script>
 

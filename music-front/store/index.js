@@ -1,28 +1,45 @@
 
 import Vue from "vue"
 import Vuex from "vuex"
- 
+
 Vue.use(Vuex);
- 
+
 export default new Vuex.Store({
-    state:{
+    state: {
         // 播放按钮状态
         playstatus: false,
         // 正在播放的音乐信息
-        music: null
+        music: null,
+        // 音乐对象
+        audio: new Audio(),
+        // 当前播放时间
+        currentTime: 0,
+        // 要修改播放进度的时间
+        updateCurrentTime: 0
     },
-    mutations:{
+    mutations: {
         // 保存播放按钮状态
-        savePlayStatus(state,playstatus){
+        savePlayStatus(state, playstatus) {
             state.playstatus = playstatus
         },
         // 保存正在播放的音乐信息
-        saveMusicInfo(state,music) {
+        saveMusicInfo(state, music) {
             state.music = music
         },
         // 修改音乐播放状态
-        updateMusicState(state,isPlaying) {
+        updateMusicState(state, isPlaying) {
             state.music.isPlaying = isPlaying
+        },
+        // 保存音乐对象
+        saveAudio(state,audio) {
+            state.audio = audio
+        },
+        // 保存当前音乐播放时间
+        saveCurrentTime(state,currentTime) {
+            state.currentTime = currentTime
+        },
+        saveUpdateCurrentTime(state,updateCurrentTime) {
+            state.updateCurrentTime = updateCurrentTime
         }
     }
 })
