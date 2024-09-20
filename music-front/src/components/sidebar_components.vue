@@ -25,7 +25,31 @@
 export default {
     methods: {
         selectOption(option) {
-            console.log(`Selected option: ${option}`);
+            // console.log(`Selected option: ${option}`);
+            if (option == "播放") {
+                // console.log("点击了播放页面")
+                var tableroute = [
+                    { isIndex: false },
+                    { isMusicInfo: true },
+                    { isCcollect: false}
+                ]
+                this.$store.commit("saveTableRoute", tableroute)
+            } else if(option == "推荐") {
+                var tableroute = [
+                    { isIndex: true },
+                    { isMusicInfo: false },
+                    { isCcollect: false}
+                ]
+                this.$store.commit("saveTableRoute", tableroute)
+            } else if(option == "收藏"){
+                // console.log("点击了收藏页面")
+                var tableroute = [
+                    { isIndex: false },
+                    { isMusicInfo: false },
+                    { isCcollect: true}
+                ]
+                this.$store.commit("saveTableRoute", tableroute)
+            }
             // 这里可以添加更多的逻辑，比如根据选项进行路由跳转或显示不同的内容等  
         }
     }

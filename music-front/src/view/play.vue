@@ -7,8 +7,14 @@
         <div class="layout-left">
             <sidebar_components />
         </div>
-        <div class="layout-right">
+        <div class="layout-right" v-if="this.$store.state.tableroute[0].isIndex">
             <recommendations />
+        </div>
+        <div class="layout-right" v-if="this.$store.state.tableroute[1].isMusicInfo">
+            <musicinfo />
+        </div>
+        <div class="layout-right" v-if="this.$store.state.tableroute[2].isCcollect">
+            <musiccollect />
         </div>
         <div class="layout-under">
             <progressbar />
@@ -22,6 +28,8 @@ import search_components from '../components/search_components.vue'
 import sidebar_components from '../components/sidebar_components.vue'
 import recommendations from '../components/recommendations.vue'
 import progressbar from '../components/progressbar.vue'
+import musicinfo from '../components/musicinfo.vue'
+import musiccollect from '../components/musiccollect.vue'
 
 
 export default {
@@ -29,9 +37,14 @@ export default {
         search_components,
         sidebar_components,
         recommendations,
-        progressbar
+        progressbar,
+        musicinfo,
+        musiccollect
     },
     methods: {
+    },
+    created() {
+        // console.log(this.$store.state.tableroute[0].isIndex)
     }
 }
 

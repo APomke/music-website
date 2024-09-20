@@ -6,6 +6,12 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
+        // 页面切换菜单
+        tableroute: [
+            {isIndex: true},
+            {isMusicInfo: false},
+            {isCcollect: false}
+        ],
         // 播放按钮状态
         playstatus: false,
         // 正在播放的音乐信息
@@ -15,7 +21,9 @@ export default new Vuex.Store({
         // 当前播放时间
         currentTime: 0,
         // 要修改播放进度的时间
-        updateCurrentTime: 0
+        updateCurrentTime: 0,
+        // 音乐封面小图标url
+        musicicon: null
     },
     mutations: {
         // 保存播放按钮状态
@@ -40,6 +48,12 @@ export default new Vuex.Store({
         },
         saveUpdateCurrentTime(state,updateCurrentTime) {
             state.updateCurrentTime = updateCurrentTime
+        },
+        saveMusicIcon(state,url) {
+            state.musicicon = url
+        },
+        saveTableRoute(state,tableroute) {
+            state.tableroute = tableroute
         }
     }
 })

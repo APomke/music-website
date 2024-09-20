@@ -1,6 +1,10 @@
 <template>
     <!--音乐播放进度-->
     <div class="progressbar-container">
+        <!--歌曲封面小图标-->
+        <div class="small-icon">
+            <img :src="this.$store.state.musicicon">
+        </div>
         <div class="time-display" v-if="this.$store.state.audio.currentTime">
             <!--当前播放时间-->
             <span class="current-time">{{ formatTime(this.$store.state.currentTime) }}</span>
@@ -8,6 +12,19 @@
         <div class="time-display" v-if="!this.$store.state.audio.currentTime">
             <!--当前播放时间-->
             <span class="current-time">00:00</span>
+        </div>
+        <div class="back" @click="backbutton">
+            <transition>
+                <svg t="1726792478717" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                    xmlns="http://www.w3.org/2000/svg" p-id="7302" width="35" height="35">
+                    <path
+                        d="M172.032 69.632c19.968 0 35.84 15.872 35.84 35.84v802.304c0 19.968-15.872 35.84-35.84 35.84s-35.84-15.872-35.84-35.84V105.472c0-19.968 16.384-35.84 35.84-35.84z"
+                        fill="#65D5A5" p-id="7303"></path>
+                    <path
+                        d="M225.28 571.904l2.048 2.048 527.36 378.368 3.584 2.048c41.984 22.528 69.632 16.384 84.992 6.656 23.04-13.824 34.816-41.472 34.816-82.944V135.168c0-52.736-25.6-74.752-40.96-82.944-10.752-5.632-22.016-8.704-34.304-8.704-15.872 0-32.256 5.12-47.104 14.848L229.376 436.224l-4.096 3.584c-35.84 36.352-35.84 95.744 0 132.096z"
+                        fill="#65D5A5" p-id="7304"></path>
+                </svg>
+            </transition>
         </div>
         <!-- 音乐播放进度 -->
         <div class="play-btn" @click="playbutton">
@@ -39,6 +56,20 @@
                 </div>
             </transition>
         </div>
+        <!--下一首按钮-->
+        <div class="next" @click="nextbutton">
+            <transition>
+                <svg t="1726791438733" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                    xmlns="http://www.w3.org/2000/svg" p-id="5234" width="35" height="35">
+                    <path
+                        d="M852.992 956.928c-20.48 0-36.864-16.384-36.864-36.864V103.424c0-20.48 16.384-36.864 36.864-36.864s36.864 16.384 36.864 36.864v816.64c0 20.48-16.384 36.864-36.864 36.864z"
+                        fill="#65D5A5" p-id="5235"></path>
+                    <path
+                        d="M799.232 445.44l-2.048-2.048L260.608 58.368l-3.584-2.048c-43.008-23.04-70.656-16.384-86.528-6.656-23.552 14.336-35.84 42.496-35.84 84.48V890.88c0 53.76 26.112 75.776 41.472 84.48 10.752 5.632 22.528 8.704 34.816 8.704 15.872 0 32.768-5.12 48.128-14.848L795.136 583.68l4.096-3.584c36.352-37.376 36.352-97.792 0-134.656z"
+                        fill="#65D5A5" p-id="5236"></path>
+                </svg>
+            </transition>
+        </div>
         <div class="time-display" v-if="this.$store.state.audio.duration">
             <!--音乐总时长-->
             <span class="total-time">{{ formatTime(this.$store.state.audio.duration) }}</span>
@@ -49,7 +80,8 @@
         </div>
         <!--进度条-->
         <div class="block">
-            <el-slider v-model="$store.state.currentTime" :show-tooltip="false" class="jindu" :max="$store.state.audio.duration" @change="updateCurrentTime"></el-slider>
+            <el-slider v-model="$store.state.currentTime" :show-tooltip="false" class="jindu"
+                :max="$store.state.audio.duration" @change="updateCurrentTime"></el-slider>
         </div>
     </div>
 </template>
@@ -96,7 +128,14 @@ export default {
             console.log(val)
             // 修改音乐播放进度
             // this.$store.state.currentTime = val;
-            this.$store.commit("saveUpdateCurrentTime",val)
+            this.$store.commit("saveUpdateCurrentTime", val)
+        },
+        backbutton() {
+            console.log("点击了上一首按钮")
+        },
+        nextbutton() {
+            console.log("点击了下一首按钮")
+            console.log(this.$store.state.musicicon)
         }
     }
 }  
@@ -120,6 +159,38 @@ export default {
     /* 使内容（包括播放按钮）垂直居中，如果只需要按钮居中，可以将此属性放在 .play-btn 上 */
 }
 
+/* 歌曲封面小图标容器 */
+.small-icon {
+    display: inline-block;
+    /* 使容器成为内联块级元素，方便控制大小 */
+    text-align: center;
+    /* 文本居中对齐 */
+    width: 60px;
+    /* 设置容器的宽度 */
+    height: 60px;
+    /* 设置容器的高度 */
+    overflow: hidden;
+    /* 超出部分隐藏 */
+    border-radius: 50%;
+    /* 圆形显示 */
+    background-color: #f0f0f0;
+    /* 背景颜色，可选 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* 添加阴影效果 */
+}
+
+/* 歌曲封面图片 */
+.small-icon img {
+    display: block;
+    /* 使图片成为块级元素 */
+    width: 100%;
+    /* 图片宽度占满容器 */
+    height: 100%;
+    /* 自动调整高度，保持原始宽高比 */
+    object-fit: cover;
+    /* 保持原始宽高比的同时覆盖整个容器 */
+}
+
 .play-btn {
     display: flex;
     justify-content: center;
@@ -130,6 +201,22 @@ export default {
     height: 60px;
     /* 确保高度一致 */
     margin: 0 auto;
+}
+
+/*下一首按钮*/
+.next {
+    display: flex;
+    justify-self: center;
+    align-items: center;
+    margin-right: 30%;
+}
+
+/*上一首按钮*/
+.back {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 30%;
 }
 
 .play-icon,
@@ -196,13 +283,15 @@ export default {
 .time-display .current-time {
     order: 1;
     /* 确保当前时间在左边 */
-    margin-left: 150px; /* 左侧间距 */
+    margin-left: 95px;
+    /* 左侧间距 */
 }
 
 .time-display .total-time {
     order: 3;
     /* 确保总时间在右边 */
-    margin-right: 150px; /* 右侧间距 */
+    margin-right: 150px;
+    /* 右侧间距 */
 }
 
 .time-display span {
@@ -251,18 +340,71 @@ export default {
         position: absolute;
     }
 }
+
 /* 响应式调整 */
 @media screen and (max-width: 768px) {
     .time-display .current-time {
         order: 1;
         /* 确保当前时间在左边 */
-        margin-left: 20px; /* 左侧间距 */
+        margin-left: 20px;
+        /* 左侧间距 */
     }
-    
+
     .time-display .total-time {
         order: 3;
         /* 确保总时间在右边 */
-        margin-right: 20px; /* 右侧间距 */
+        margin-right: 20px;
+        /* 右侧间距 */
+    }
+
+    /*下一首按钮*/
+    .next {
+        display: flex;
+        justify-self: center;
+        align-items: center;
+        gap: 10px;
+        margin-right: 20px;
+    }
+
+    /*上一首按钮*/
+    .back {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-left: 20px;
+    }
+
+    /* 歌曲封面小图标容器 */
+    .small-icon {
+        display: inline-block;
+        /* 使容器成为内联块级元素，方便控制大小 */
+        text-align: center;
+        /* 文本居中对齐 */
+        width: 0px;
+        /* 设置容器的宽度 */
+        height: 0px;
+        /* 设置容器的高度 */
+        overflow: hidden;
+        /* 超出部分隐藏 */
+        border-radius: 50%;
+        /* 圆形显示 */
+        background-color: #f0f0f0;
+        /* 背景颜色，可选 */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        /* 添加阴影效果 */
+    }
+
+    /* 歌曲封面图片 */
+    .small-icon img {
+        display: block;
+        /* 使图片成为块级元素 */
+        width: 100%;
+        /* 图片宽度占满容器 */
+        height: 100%;
+        /* 自动调整高度，保持原始宽高比 */
+        object-fit: cover;
+        /* 保持原始宽高比的同时覆盖整个容器 */
     }
 }
 </style>

@@ -51,7 +51,7 @@ export default {
     data() {
         return {
             recommendations: [
-                { id: 1, title: '音乐标题1', artist: '艺术家1', url: '../music/11.稻香.wav', isPlaying: false },
+                { id: 1, title: '音乐标题1', artist: '艺术家1', url: '../music/11.稻香.wav', iconurl:"https://awsimage-1.oss-cn-hangzhou.aliyuncs.com/image-20240920091824796.png", isPlaying: false },
                 { id: 2, title: '音乐标题2', artist: '艺术家2', isPlaying: false },
                 { id: 3, title: '音乐标题1', artist: '艺术家1', isPlaying: false },
                 { id: 4, title: '音乐标题2', artist: '艺术家2', isPlaying: false },
@@ -93,6 +93,7 @@ export default {
             if (this.musicid !== id || this.musicid == null) {
                 this.audio.pause();
                 this.$store.commit("savePlayStatus", false);
+                this.$store.commit("saveMusicIcon",this.recommendations[this.musicid ? this.recommendations.findIndex(item => item.id === this.musicid) : index].iconurl)
                 this.recommendations[this.musicid ? this.recommendations.findIndex(item => item.id === this.musicid) : index].isPlaying = false;
                 // 设置播放时长
                 this.duration = this.formatTime(this.audio.duration)
@@ -108,6 +109,7 @@ export default {
                 // 把播放的音乐保存到vuex
                 this.$store.commit("saveMusicInfo", this.recommendations[index])
                 this.$store.commit("saveAudio",this.audio)
+                this.$store.commit("saveMusicIcon",this.recommendations[this.musicid ? this.recommendations.findIndex(item => item.id === this.musicid) : index].iconurl)
 
                 this.audio.play();
                 // 保存音乐id
