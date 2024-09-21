@@ -51,7 +51,7 @@ export default {
     data() {
         return {
             recommendations: [
-                { id: 1, title: '音乐标题1', artist: '艺术家1', url: '../music/11.稻香.wav', iconurl:"https://awsimage-1.oss-cn-hangzhou.aliyuncs.com/image-20240920091824796.png", isPlaying: false },
+                { id: 1, title: '音乐标题1', artist: '艺术家1', url: '../music/11.稻香.wav', iconurl: "https://awsimage-1.oss-cn-hangzhou.aliyuncs.com/image-20240920091824796.png", isPlaying: false },
                 { id: 2, title: '音乐标题2', artist: '艺术家2', isPlaying: false },
                 { id: 3, title: '音乐标题1', artist: '艺术家1', isPlaying: false },
                 { id: 4, title: '音乐标题2', artist: '艺术家2', isPlaying: false },
@@ -85,19 +85,23 @@ export default {
 
         },
         handlePlayClick(id) {
-            console.log(id)
+            // console.log(id)
             // 找到对应的音乐卡片
             const index = this.recommendations.findIndex(item => item.id === id);
 
             // 如果音乐id不是之前保存的或者音乐id为null则先暂停播放音乐并让所有按钮图标样式归位
-            if (this.musicid !== id || this.musicid == null) {
-                this.audio.pause();
-                this.$store.commit("savePlayStatus", false);
-                this.$store.commit("saveMusicIcon",this.recommendations[this.musicid ? this.recommendations.findIndex(item => item.id === this.musicid) : index].iconurl)
+            if (this.$store.state.musicid !== id || this.$store.state.musicid == null) {
+                // this.audio.pause();
+                // this.$store.commit("savePlayStatus", false);
+                this.$store.commit("saveMusicIcon", this.recommendations[id ? this.recommendations.findIndex(item => item.id === id) : index].iconurl)
+                // 保存音乐 audio到vuex
+                this.$store.commit("saveAudio", this.audio)
+                this.$store.commit("saveMusicId", id)
+
                 this.recommendations[this.musicid ? this.recommendations.findIndex(item => item.id === this.musicid) : index].isPlaying = false;
                 // 设置播放时长
                 this.duration = this.formatTime(this.audio.duration)
-                console.log("得到初始化的时长:", this.duration)
+                // console.log("得到初始化的时长:", this.duration)
             }
             // 改变对应的音乐卡片按钮的svg播放图标
             this.recommendations[index].isPlaying = !this.recommendations[index].isPlaying;
@@ -108,15 +112,18 @@ export default {
                 // 根据id查询要播放音乐的url
                 // 把播放的音乐保存到vuex
                 this.$store.commit("saveMusicInfo", this.recommendations[index])
-                this.$store.commit("saveAudio",this.audio)
-                this.$store.commit("saveMusicIcon",this.recommendations[this.musicid ? this.recommendations.findIndex(item => item.id === this.musicid) : index].iconurl)
-
-                this.audio.play();
+                this.$store.commit("saveAudio", this.audio)
+                this.$store.commit("saveMusicIcon", this.recommendations[this.musicid ? this.recommendations.findIndex(item => item.id === this.musicid) : index].iconurl)
+                this.$store.commit("saveMusicId", id)
+                this.$store.commit("savePlayStatus", true);
+                // this.audio.play();
+                this.$store.state.audio.play()
                 // 保存音乐id
                 this.musicid = id
             } else {
                 // 暂停播放
-                this.audio.pause();
+                // this.audio.pause();
+                this.$store.state.audio.pause()
             }
             // 改变进度条播放按钮样式
             this.$store.commit("savePlayStatus", this.recommendations[index].isPlaying);
@@ -127,22 +134,47 @@ export default {
             const secondsLeft = Math.floor(seconds % 60);
             return `${String(minutes).padStart(2, '0')}:${String(secondsLeft).padStart(2, '0')}`;
         },
+        // 从vuex里读取当前播放音乐的id，以便重新进入这个页面的时候改变对应的播放按钮样式
+        initPlay() {
+            if (this.$store.state.musicid && this.$store.state.playstatus) {
+                // 修改对应的播放按钮样式
+                const index = this.recommendations.findIndex(item => item.id === this.$store.state.musicid);
+                // 改变对应的音乐卡片按钮的svg播放图标
+                this.recommendations[index].isPlaying = true;
+
+            }
+        },
+        updatePlayStyle(newVal) {
+            // 修改对应的播放按钮样式
+            const index = this.recommendations.findIndex(item => item.id === this.$store.state.musicid);
+            // 改变对应的音乐卡片按钮的svg播放图标
+            this.recommendations[index].isPlaying = newVal;
+        }
     },
     created() {
         // this.getRecommedations()
+        this.initPlay()
     },
     watch: {
+        // 全局播放状态
+        "$store.state.playstatus": {
+            deep: true,
+            handler: function (newVal, oldVal) {
+                this.updatePlayStyle(newVal)
+            }
+        },
+        // 监控进度条播放按钮状态
         "$store.state.music.isPlaying": {
             deep: true,//深度监听设置为 true
             handler: function (newVal, oldVal) {
                 if (newVal) {
                     //播放音乐
-                    this.audio.play();
+                    this.$store.state.audio.play();
                     // 修改vuex里的音乐状态
                     this.$store.commit("updateMusicState", true)
                 } else {
                     //暂停音乐
-                    this.audio.pause();
+                    this.$store.state.audio.pause();
                     // 修改vuex里的音乐状态
                     this.$store.commit("updateMusicState", false)
                 }
@@ -150,12 +182,12 @@ export default {
         },
         "$store.state.updateCurrentTime": {
             deep: true,
-            handler: function (newVal,oldVal) {
+            handler: function (newVal, oldVal) {
                 if (newVal) {
                     // 修改音乐播放进度
                     // console.log("修改播放进度")
                     this.audio.currentTime = newVal
-                    this.$store.commit("saveAudio",this.audio)
+                    this.$store.commit("saveAudio", this.audio)
                 }
             }
         }
@@ -166,7 +198,7 @@ export default {
         this.audio.addEventListener('timeupdate', () => {
             this.currentTime = this.formatTime(this.audio.currentTime);
             // 保存到vux
-            this.$store.commit("saveCurrentTime",this.audio.currentTime)
+            this.$store.commit("saveCurrentTime", this.audio.currentTime)
             // console.log("当前音乐播放时间:",this.currentTime)
         });
 

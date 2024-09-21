@@ -1,25 +1,141 @@
 <template>
     <div class="music-info">
-        音乐播放信息
+        <!-- 音乐播放信息 -->
+        <!--左侧音乐封面-->
+        <div class="music-img">
+            <img :src="this.$store.state.musicicon">
+        </div>
+        <!--右侧歌词-->
+        <div class="music-lyric">
+            <!--歌名-->
+            <div class="music-title">
+                {{ this.$store.state.music.title }}
+            </div><br />
+            <!--作者-->
+            <div class="music-artilst">
+                {{ this.$store.state.music.artist }}
+            </div><br />
+            {{ lyric }}
+        </div>
     </div>
 </template>
 <script>
-
+export default {
+    data() {
+        return {
+            lyric: ""
+        }
+    },
+    methods: {
+        // 通过vuex得到音乐id然后请求歌词
+        getLyric() {
+            this.lyric = "暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词";
+        }
+    },
+    created() {
+        this.getLyric()
+        console.log("获取音乐信息：", this.$store.state.music.artist)
+    }
+}
 </script>
 
 <style>
 .music-info {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    /* 水平排列 */
     padding: 40px;
     box-sizing: border-box;
-    overflow-y: auto;
-    align-items: flex-start;
-    /* 如果内容过多，允许滚动 */
-    width: calc(100% - 10%);
-    /* 在大屏幕下占据90%的宽度，与侧边栏对齐 */
-    margin-left: 10%;
-    /* 在大屏幕下与侧边栏对齐 */
+    align-items: center;
+    /* 垂直居中 */
+    justify-content: space-between;
+    /* 左右对齐 */
+    width: calc(100% - 20px);
+    /* 减去padding的总和 */
+    max-width: 1300px;
+    /* 最大宽度限制 */
+    margin: 0 auto;
+    /* 居中 */
+}
 
+.music-img {
+    position: relative;
+    flex: 0 0 auto;
+    /* 不允许收缩或增长 */
+    margin-right: 400px;
+    /* 右边距 */
+    transition: transform 0.5s ease-in-out;
+    /* 过渡效果 */
+}
+
+.music-img:hover img {
+    transform: scale(1.1);
+    /* 鼠标悬停时放大 */
+}
+
+.music-img img {
+    width: 450px;
+    /* 图片宽度 */
+    height: 300px;
+    object-fit: cover;
+    /* 图像填充方式 */
+    border-radius: 10px;
+    /* 圆角 */
+}
+
+.music-lyric {
+    flex: 1;
+    /* 允许伸展以填充剩余空间 */
+    font-size: 16px;
+    /* 字体大小 */
+    line-height: 1.5em;
+    /* 行高 */
+    overflow-y: scroll; /* 启用垂直滚动 */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;     /* Firefox */
+}
+
+.music-lyric::-webkit-scrollbar { 
+    display: none;             /* Safari 和 Chrome */
+}
+
+.music-title {
+    flex: 1;
+    font-size: 36px;
+    line-height: 3.5em;
+    margin-bottom: 130px;
+}
+
+.music-artilst {
+    flex: 1;
+    font-size: 26px;
+    line-height: 2.5em;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .music-info {
+        flex-direction: column;
+        /* 小屏幕垂直堆叠 */
+        align-items: center;
+        /* 内容居中 */
+    }
+
+    .music-img {
+        margin-right: 0px;
+        margin-left: 60px;
+        margin-bottom: 20px;
+        /* 底边距 */
+    }
+
+    .music-img img {
+        width: 240px;
+        /* 图片宽度 */
+        height: 200px;
+        object-fit: cover;
+        /* 图像填充方式 */
+        border-radius: 10px;
+        /* 圆角 */
+    }
 }
 </style>

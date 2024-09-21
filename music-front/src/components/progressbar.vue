@@ -109,9 +109,11 @@ export default {
                     console.log("播放")
                     // console.log(this.$store.state.music.id)
                     // 修改音乐信息
+                    this.$store.state.audio.play();
                     this.$store.commit("updateMusicState", true)
                 } else {
                     console.log("暂停")
+                    this.$store.state.audio.pause();
                     this.$store.commit("updateMusicState", false)
                 }
                 console.log(this.$store.state.playstatus)

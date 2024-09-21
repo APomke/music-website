@@ -1,2 +1,37 @@
 create table simple (name varchar(255),age varchar(255));
 inter into simple values ("张三","18");
+
+-- music
+create table music (
+    id varchar(255),
+    title varchar(255),
+    artist varchar(255),
+    url varchar(255),
+    icon_url varchar(255),
+    lyric_url varchar(255),
+    file_size varchar(255),
+    level varchar(255),
+    collect_count varchar(255)
+)
+
+-- user
+create table user (
+    uid varchar(255),
+    username varchar(255),
+    password varchar(255),
+    email varchar(255),
+    sex varchar(255),
+    age varchar(255),
+    avatar_url varchar(255),
+)
+
+-- collect
+create table collect (
+    id varchar(255),
+    uid varchar(255),
+    music_title varchar(255),
+    music_artist varchar(255),
+    url varchar(255),
+    icon_url varchar(255),
+    level varchar(255),
+)

@@ -2,7 +2,8 @@ HELP.md
 target/
 **/target/
 **/dist/
-
+.DS_Store
+**/.DS_Store
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

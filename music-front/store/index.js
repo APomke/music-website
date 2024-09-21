@@ -15,6 +15,7 @@ export default new Vuex.Store({
         // 播放按钮状态
         playstatus: false,
         // 正在播放的音乐信息
+        musicid: null,
         music: null,
         // 音乐对象
         audio: new Audio(),
@@ -26,7 +27,7 @@ export default new Vuex.Store({
         musicicon: null
     },
     mutations: {
-        // 保存播放按钮状态
+        // 保存进度条播放按钮状态
         savePlayStatus(state, playstatus) {
             state.playstatus = playstatus
         },
@@ -54,6 +55,9 @@ export default new Vuex.Store({
         },
         saveTableRoute(state,tableroute) {
             state.tableroute = tableroute
+        },
+        saveMusicId(state,id){
+            state.musicid = id
         }
     }
 })

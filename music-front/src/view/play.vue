@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="layout-top">
+        <div class="layout-top" v-if="this.$store.state.tableroute[0].isIndex">
             <!--上搜索音乐-->
             <search_components />
         </div>
