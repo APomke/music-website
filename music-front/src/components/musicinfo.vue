@@ -1,9 +1,9 @@
 <template>
-    <div class="music-info">
+    <div class="music-info" v-if="isDefaultView">
         <!-- 音乐播放信息 -->
         <!--左侧音乐封面-->
         <div class="music-img">
-            <img :src="this.$store.state.musicicon">
+            <img :src="this.$store.state.music.fine_picture_url">
         </div>
         <!--右侧歌词-->
         <div class="music-lyric">
@@ -18,24 +18,73 @@
             {{ lyric }}
         </div>
     </div>
+    <div class="music-info" v-else-if="!isDefaultView">
+        <!-- 音乐播放信息 -->
+        <!--左侧音乐封面-->
+        <div class="music-img">
+            <img src="../image/unicorn.jpeg">
+        </div>
+        <!--右侧歌词-->
+        <div class="music-lyric">
+            <!--歌名-->
+            <div class="music-title">
+                请选择音乐
+            </div><br />
+            <!--作者-->
+            <div class="music-artilst">
+                无
+            </div><br />
+            {{ lyric }}
+        </div>
+    </div>
 </template>
 <script>
 export default {
     data() {
         return {
-            lyric: ""
+            lyric: "",
+            isDefaultView: false, // 是否显示默认视图
+            audio: new Audio(),
         }
     },
     methods: {
         // 通过vuex得到音乐id然后请求歌词
         getLyric() {
             this.lyric = "暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词暂无歌词";
-        }
+        },
+        // 把播放时间转换为00:00的结构
+        formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secondsLeft = Math.floor(seconds % 60);
+            return `${String(minutes).padStart(2, '0')}:${String(secondsLeft).padStart(2, '0')}`;
+        },
     },
     created() {
+        this.audio = this.$store.state.audio
         this.getLyric()
-        console.log("获取音乐信息：", this.$store.state.music.artist)
-    }
+        console.log("获取音乐信息：", this.$store.state.music)
+        if (this.$store.state.music) {
+            this.isDefaultView = true
+        } else {
+            console.log("未获取到音乐信息,显示默认视图")
+        }
+    },
+    mounted() {
+
+        // 监听音频播放状态变化
+        this.audio.addEventListener('timeupdate', () => {
+            this.currentTime = this.formatTime(this.audio.currentTime);
+            // 保存到vux
+            this.$store.commit("saveCurrentTime", this.$store.state.audio.currentTime)
+            // console.log("当前音乐播放时间:", this.currentTime)
+        });
+
+        // 监听音频播放结束
+        this.audio.addEventListener('ended', () => {
+            console.log('音频播放结束');
+            this.currentTime = 0;
+        });
+    },
 }
 </script>
 
@@ -90,13 +139,17 @@ export default {
     /* 字体大小 */
     line-height: 1.5em;
     /* 行高 */
-    overflow-y: scroll; /* 启用垂直滚动 */
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;     /* Firefox */
+    overflow-y: scroll;
+    /* 启用垂直滚动 */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
 }
 
-.music-lyric::-webkit-scrollbar { 
-    display: none;             /* Safari 和 Chrome */
+.music-lyric::-webkit-scrollbar {
+    display: none;
+    /* Safari 和 Chrome */
 }
 
 .music-title {

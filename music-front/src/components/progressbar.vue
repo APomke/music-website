@@ -139,7 +139,9 @@ export default {
             console.log("点击了下一首按钮")
             console.log(this.$store.state.musicicon)
         }
-    }
+    },
+    mounted() {
+    },
 }  
 </script>
 

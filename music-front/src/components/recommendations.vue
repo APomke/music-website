@@ -5,7 +5,7 @@
         </div>
         <div class="recommendations-body">
             <div class="recommendation-card" v-for="(recommendation) in recommendations" :key="recommendation.id"
-                @click="handleCardClick(index)">
+                @click="handleCardClick(recommendation.id)">
                 <div class="recommendation-cover">
                     <img src="../image/daox.png" alt="">
                 </div>
@@ -73,8 +73,39 @@ export default {
         };
     },
     methods: {
-        handleCardClick(index) {
-            console.log(index);
+        handleCardClick(id) {
+            console.log(id);
+            // 根据id出现对应的音乐信息然后切换到播放页面
+
+            // 先暂时模拟从前端查询到音乐信息
+            var music = { id: 1, title: '音乐标题1', artist: '艺术家1', url: '../music/11.稻香.wav', iconurl: "https://awsimage-1.oss-cn-hangzhou.aliyuncs.com/image-20240920091824796.png", fine_picture_url: "https://awsimage-1.oss-cn-hangzhou.aliyuncs.com/image-20240920091824796.png", isPlaying: false }
+
+            // 保存音乐 audio到vuex
+            this.$store.commit("saveMusicInfo", music)
+            // 如果不在播放音乐则更换进度条小图标
+            if (!this.$store.state.playstatus) {
+                this.$store.commit("saveMusicIcon", this.recommendations[id ? this.recommendations.findIndex(item => item.id === id) : index].iconurl)
+            }
+            // 如果还没选择音乐则设置改音乐为要播放的音乐
+            // 设置音频的 src 并保存到 Vuex
+            if (!this.$store.state.audio.src) {
+                this.audio.src = music.url;
+                this.$store.dispatch('setAudioSrc', music.url);
+                this.$store.commit("saveMusicId", id)
+                this.$store.commit("saveCurrentTime",0)
+                // 设置播放时长
+                this.duration = this.formatTime(this.audio.duration)
+            }
+            // this.$store.commit("saveAudio", this.audio)
+            // this.$store.commit("saveMusicId", id)
+            // this.$store.commit("saveCurrentTime",0)
+
+            var tableroute = [
+                { isIndex: false },
+                { isMusicInfo: true },
+                { isCcollect: false }
+            ]
+            this.$store.commit("saveTableRoute", tableroute)
         },
         getRecommedations() {
             api.getRecommendationsMusic().then(response => {
@@ -190,7 +221,8 @@ export default {
                     this.$store.commit("saveAudio", this.audio)
                 }
             }
-        }
+        },
+
     },
     mounted() {
 
@@ -198,7 +230,7 @@ export default {
         this.audio.addEventListener('timeupdate', () => {
             this.currentTime = this.formatTime(this.audio.currentTime);
             // 保存到vux
-            this.$store.commit("saveCurrentTime", this.audio.currentTime)
+            this.$store.commit("saveCurrentTime", this.$store.state.audio.currentTime)
             // console.log("当前音乐播放时间:",this.currentTime)
         });
 

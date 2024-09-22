@@ -59,5 +59,12 @@ export default new Vuex.Store({
         saveMusicId(state,id){
             state.musicid = id
         }
-    }
+    },
+    actions: {
+        // 设置音频对象的 src
+        setAudioSrc({ commit }, src) {
+          const audio = new Audio(src);
+          commit("saveAudio", audio);
+        }
+      },
 })
