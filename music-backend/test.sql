@@ -12,7 +12,7 @@ create table music (
     file_size varchar(255),
     level varchar(255),
     collect_count varchar(255)
-)
+);
 
 -- user
 create table user (
@@ -22,8 +22,10 @@ create table user (
     email varchar(255),
     sex varchar(255),
     age varchar(255),
-    avatar_url varchar(255),
-)
+    avatar_url varchar(255)
+);
+INSERT INTO user (uid,username, password, email, sex, age, avatar_url)
+VALUES ('xx-yy-zz', 'admin', '88888888', 'example@email.com', 'male', 25, 'http://example.com/avatar.jpg');
 
 -- collect
 create table collect (
@@ -33,5 +35,5 @@ create table collect (
     music_artist varchar(255),
     url varchar(255),
     icon_url varchar(255),
-    level varchar(255),
-)
+    level varchar(255)
+);
