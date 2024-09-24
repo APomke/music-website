@@ -6,18 +6,34 @@ import com.lidong.music.entity.Music;
 import com.lidong.music.service.MusicService;
 import com.lidong.music.entity.ResponseVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 public class MusicController {
 
     @Autowired
     private MusicService musicService;
     
     // 查询
+
+    // 获取推荐音乐列表
+    @GetMapping("/music/recommendations")
+    public ResponseVO recommendations() {
+        ResponseVO responseVO = new ResponseVO();
+        List<Music> musicList = musicService.list();
+        responseVO.setCode(200);
+        responseVO.setInfo("查询成功！");
+        responseVO.setStatus("success");
+        responseVO.setData(musicList);
+//        System.out.println(musicList.toString());
+//        System.out.println(responseVO.toString());
+        return responseVO;
+    }
     
     
     @GetMapping("/getMusicListById")

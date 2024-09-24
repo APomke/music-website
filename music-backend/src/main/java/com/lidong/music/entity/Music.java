@@ -23,5 +23,6 @@ public class Music {
     private String lyric_url;
     private String file_size;
     private String level;
+    private boolean playing;
     private String collect_count;
 }

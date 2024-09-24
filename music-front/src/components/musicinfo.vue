@@ -3,7 +3,7 @@
         <!-- 音乐播放信息 -->
         <!--左侧音乐封面-->
         <div class="music-img">
-            <img :src="this.$store.state.music.fine_picture_url">
+            <img :src="this.$store.state.music.icon_url">
         </div>
         <!--右侧歌词-->
         <div class="music-lyric">

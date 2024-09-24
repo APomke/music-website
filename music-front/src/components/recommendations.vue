@@ -4,29 +4,31 @@
             推荐音乐
         </div>
         <div class="recommendations-body">
-            <div class="recommendation-card" v-for="(recommendation) in recommendations" :key="recommendation.id"
+            <div class="recommendation-card" v-for="(recommendation) in recommendations" :key="recommendation.id" 
                 @click="handleCardClick(recommendation.id)">
                 <div class="recommendation-cover">
-                    <img src="../image/daox.png" alt="">
+                    <img :src="recommendation.icon_url" alt="">
                 </div>
                 <div class="recommendation-info">
                     <div class="recommendation-title">{{ recommendation.title }}</div>
                     <div class="recommendation-artist">{{ recommendation.artist }}</div>
                     <button class="play-button" @click.stop="handlePlayClick(recommendation.id)">
-                        <transition name="fade">
-                            <svg t="1725370962119" class="p-icon" viewBox="0 0 1024 1024" version="1.1"
-                                xmlns="http://www.w3.org/2000/svg" p-id="3529" width="60" height="60">
-                                <path
-                                    d="M512 58.632258c140.890839 1.263484 261.144774 36.612129 338.299871 115.072C928.755613 250.851097 964.104258 371.109161 965.367742 512c-1.263484 140.890839-36.612129 261.144774-115.067871 338.299871-77.155097 78.455742-197.409032 113.804387-338.299871 115.067871-140.890839-1.263484-261.148903-36.612129-338.295742-115.067871C95.244387 773.144774 59.895742 652.890839 58.632258 512c1.263484-140.890839 36.612129-261.148903 115.072-338.295742C250.851097 95.244387 371.109161 59.895742 512 58.632258z"
-                                    fill="#6EDBA2" p-id="3530"></path>
-                                <path
-                                    d="M385.515355 364.791742c6.561032-44.531613 38.660129-71.89471 73.377032-49.589677 61.419355 39.064774 133.326452 97.094194 205.563871 147.563354 42.244129 29.588645 42.244129 68.884645 0 98.465033-72.237419 50.47329-144.144516 108.498581-205.563871 147.559225-34.716903 22.305032-66.816-5.062194-73.377032-49.589677a1204.327226 1204.327226 0 0 1 0-294.408258z"
-                                    fill="#FFFFFF" opacity=".8" p-id="3531"></path>
-                            </svg>
-                        </transition>
+                        <div v-if="!recommendation.playing">
+                            <transition name="fade">
+                                <svg t="1725370962119" class="p-icon" viewBox="0 0 1024 1024" version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg" p-id="3529" width="60" height="60">
+                                    <path
+                                        d="M512 58.632258c140.890839 1.263484 261.144774 36.612129 338.299871 115.072C928.755613 250.851097 964.104258 371.109161 965.367742 512c-1.263484 140.890839-36.612129 261.144774-115.067871 338.299871-77.155097 78.455742-197.409032 113.804387-338.299871 115.067871-140.890839-1.263484-261.148903-36.612129-338.295742-115.067871C95.244387 773.144774 59.895742 652.890839 58.632258 512c1.263484-140.890839 36.612129-261.148903 115.072-338.295742C250.851097 95.244387 371.109161 59.895742 512 58.632258z"
+                                        fill="#6EDBA2" p-id="3530"></path>
+                                    <path
+                                        d="M385.515355 364.791742c6.561032-44.531613 38.660129-71.89471 73.377032-49.589677 61.419355 39.064774 133.326452 97.094194 205.563871 147.563354 42.244129 29.588645 42.244129 68.884645 0 98.465033-72.237419 50.47329-144.144516 108.498581-205.563871 147.559225-34.716903 22.305032-66.816-5.062194-73.377032-49.589677a1204.327226 1204.327226 0 0 1 0-294.408258z"
+                                        fill="#FFFFFF" opacity=".8" p-id="3531"></path>
+                                </svg>
+                            </transition>
+                        </div>
                         <!--暂停播放按钮-->
                         <transition name="fade">
-                            <div v-if="recommendation.isPlaying">
+                            <div v-if="recommendation.playing">
                                 <svg t="1726187728687" class="p-icon" viewBox="0 0 1024 1024" version="1.1"
                                     xmlns="http://www.w3.org/2000/svg" p-id="7795" width="60" height="60">
                                     <path d="M512 483.4m-380 0a380 380 0 1 0 760 0 380 380 0 1 0-760 0Z" fill="#31BC69"
@@ -51,17 +53,6 @@ export default {
     data() {
         return {
             recommendations: [
-                { id: 1, title: '音乐标题1', artist: '艺术家1', url: '../music/11.稻香.wav', iconurl: "https://awsimage-1.oss-cn-hangzhou.aliyuncs.com/image-20240920091824796.png", isPlaying: false },
-                { id: 2, title: '音乐标题2', artist: '艺术家2', isPlaying: false },
-                { id: 3, title: '音乐标题1', artist: '艺术家1', isPlaying: false },
-                { id: 4, title: '音乐标题2', artist: '艺术家2', isPlaying: false },
-                { id: 5, title: '音乐标题1', artist: '艺术家1', isPlaying: false },
-                { id: 6, title: '音乐标题2', artist: '艺术家2', isPlaying: false },
-                { id: 7, title: '音乐标题1', artist: '艺术家1', isPlaying: false },
-                { id: 8, title: '音乐标题2', artist: '艺术家2', isPlaying: false },
-                { id: 9, title: '音乐标题1', artist: '艺术家1', isPlaying: false },
-                { id: 10, title: '音乐标题2', artist: '艺术家2', isPlaying: false }
-                // 添加更多推荐音乐  
             ],
             audio: new Audio(require('@/music/11.稻香.wav')),
             // 记录正在播放的音乐id
@@ -78,13 +69,13 @@ export default {
             // 根据id出现对应的音乐信息然后切换到播放页面
 
             // 先暂时模拟从前端查询到音乐信息
-            var music = { id: 1, title: '音乐标题1', artist: '艺术家1', url: '../music/11.稻香.wav', iconurl: "https://awsimage-1.oss-cn-hangzhou.aliyuncs.com/image-20240920091824796.png", fine_picture_url: "https://awsimage-1.oss-cn-hangzhou.aliyuncs.com/image-20240920091824796.png", isPlaying: false }
-
+            // var music = { id: 1, title: '音乐标题1', artist: '艺术家1', url: '../music/11.稻香.wav', iconurl: "https://awsimage-1.oss-cn-hangzhou.aliyuncs.com/image-20240920091824796.png", fine_picture_url: "https://awsimage-1.oss-cn-hangzhou.aliyuncs.com/image-20240920091824796.png", playing: false }
+            var music = this.recommendations[id ? this.recommendations.findIndex(item => item.id === id) : index]
             // 保存音乐 audio到vuex
             this.$store.commit("saveMusicInfo", music)
             // 如果不在播放音乐则更换进度条小图标
             if (!this.$store.state.playstatus) {
-                this.$store.commit("saveMusicIcon", this.recommendations[id ? this.recommendations.findIndex(item => item.id === id) : index].iconurl)
+                this.$store.commit("saveMusicIcon", this.recommendations[id ? this.recommendations.findIndex(item => item.id === id) : index].icon_url)
             }
             // 如果还没选择音乐则设置改音乐为要播放的音乐
             // 设置音频的 src 并保存到 Vuex
@@ -109,7 +100,8 @@ export default {
         },
         getRecommedations() {
             api.getRecommendationsMusic().then(response => {
-                this.recommendations = response.data
+                // console.log(response.data)
+                this.recommendations = response.data.data
             }).catch(error => {
                 console.error(error);
             });
@@ -124,40 +116,43 @@ export default {
             if (this.$store.state.musicid !== id || this.$store.state.musicid == null) {
                 // this.audio.pause();
                 // this.$store.commit("savePlayStatus", false);
-                this.$store.commit("saveMusicIcon", this.recommendations[id ? this.recommendations.findIndex(item => item.id === id) : index].iconurl)
+                this.$store.commit("saveMusicIcon", this.recommendations[id ? this.recommendations.findIndex(item => item.id === id) : index].icon_url)
                 // 保存音乐 audio到vuex
+                // this.$store.commit("saveAudio", this.audio)
+                this.audio.src = this.recommendations[index].url;
                 this.$store.commit("saveAudio", this.audio)
                 this.$store.commit("saveMusicId", id)
 
-                this.recommendations[this.musicid ? this.recommendations.findIndex(item => item.id === this.musicid) : index].isPlaying = false;
+                this.recommendations[this.musicid ? this.recommendations.findIndex(item => item.id === this.musicid) : index].playing = false;
                 // 设置播放时长
                 this.duration = this.formatTime(this.audio.duration)
                 // console.log("得到初始化的时长:", this.duration)
             }
             // 改变对应的音乐卡片按钮的svg播放图标
-            this.recommendations[index].isPlaying = !this.recommendations[index].isPlaying;
+            this.recommendations[index].playing = !this.recommendations[index].playing;
 
-            if (this.recommendations[index].isPlaying) {
+            if (this.recommendations[index].playing) {
                 // 开始播放音频
                 // this.audio.src = require(`@/music/${id}.wav`);
                 // 根据id查询要播放音乐的url
                 // 把播放的音乐保存到vuex
                 this.$store.commit("saveMusicInfo", this.recommendations[index])
-                this.$store.commit("saveAudio", this.audio)
-                this.$store.commit("saveMusicIcon", this.recommendations[this.musicid ? this.recommendations.findIndex(item => item.id === this.musicid) : index].iconurl)
+                // this.$store.commit("saveAudio", this.audio)
+                this.$store.commit("saveMusicIcon", this.recommendations[this.musicid ? this.recommendations.findIndex(item => item.id === this.musicid) : index].icon_url)
                 this.$store.commit("saveMusicId", id)
                 this.$store.commit("savePlayStatus", true);
                 // this.audio.play();
                 this.$store.state.audio.play()
                 // 保存音乐id
                 this.musicid = id
+                this.updatePlayStyle(true);
             } else {
                 // 暂停播放
                 // this.audio.pause();
                 this.$store.state.audio.pause()
             }
             // 改变进度条播放按钮样式
-            this.$store.commit("savePlayStatus", this.recommendations[index].isPlaying);
+            this.$store.commit("savePlayStatus", this.recommendations[index].playing);
         },
         // 把播放时间转换为00:00的结构
         formatTime(seconds) {
@@ -171,7 +166,7 @@ export default {
                 // 修改对应的播放按钮样式
                 const index = this.recommendations.findIndex(item => item.id === this.$store.state.musicid);
                 // 改变对应的音乐卡片按钮的svg播放图标
-                this.recommendations[index].isPlaying = true;
+                this.recommendations[index].playing = true;
 
             }
         },
@@ -179,11 +174,12 @@ export default {
             // 修改对应的播放按钮样式
             const index = this.recommendations.findIndex(item => item.id === this.$store.state.musicid);
             // 改变对应的音乐卡片按钮的svg播放图标
-            this.recommendations[index].isPlaying = newVal;
+            this.recommendations[index].playing = newVal;
         }
     },
     created() {
-        // this.getRecommedations()
+        this.getRecommedations()
+        // console.log(this.recommendations)
         this.initPlay()
     },
     watch: {
@@ -195,7 +191,7 @@ export default {
             }
         },
         // 监控进度条播放按钮状态
-        "$store.state.music.isPlaying": {
+        "$store.state.music.playing": {
             deep: true,//深度监听设置为 true
             handler: function (newVal, oldVal) {
                 if (newVal) {

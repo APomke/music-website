@@ -17,6 +17,7 @@
             <li @click="selectOption('推荐')">推荐</li>
             <li @click="selectOption('播放')">播放</li>
             <li @click="selectOption('收藏')">收藏</li>
+            <li @click="selectOption('上传')">上传</li>
         </ul>
     </div>
 </template>
