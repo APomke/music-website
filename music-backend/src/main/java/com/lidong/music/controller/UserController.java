@@ -6,18 +6,39 @@ import com.lidong.music.entity.User;
 import com.lidong.music.service.UserService;
 import com.lidong.music.entity.ResponseVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
+@CrossOrigin
 public class UserController {
 
     @Autowired
     private UserService userService;
     
     // 查询
+    // 登录
+    @PostMapping("/user/login")
+    public ResponseVO login(@RequestBody User user) {
+        ResponseVO responseVO = new ResponseVO();
+        List<User> userList = userService.getUserListByUsername(user.getUsername());
+        if (!userList.isEmpty()) {
+            User user1 = userList.get(0);
+            if (user1.getPassword().equals(user.getPassword())) {
+                responseVO.setCode(200);
+                responseVO.setInfo("密码验证成功！");
+                responseVO.setStatus("success");
+                responseVO.setData(user1);
+            }
+        }else {
+            responseVO.setCode(403);
+            responseVO.setInfo("密码验证失败！");
+            responseVO.setStatus("success");
+        }
+        return responseVO;
+
+    }
     
     
     @GetMapping("/getUserListByUid")

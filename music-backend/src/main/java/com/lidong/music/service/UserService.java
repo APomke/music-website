@@ -12,7 +12,6 @@ public interface UserService extends IService<User> {
     * @Description Service接口
     */
     // 查询
-
     
     List<User> getUserListByUid(String uid);
     

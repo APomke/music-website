@@ -1,5 +1,3 @@
-create table simple (name varchar(255),age varchar(255));
-inter into simple values ("张三","18");
 
 -- music
 create table music (
@@ -11,6 +9,7 @@ create table music (
     lyric_url varchar(255),
     file_size varchar(255),
     level varchar(255),
+    playing tinyint(1);
     collect_count varchar(255)
 );
 
@@ -37,3 +36,5 @@ create table collect (
     icon_url varchar(255),
     level varchar(255)
 );
+
+ALTER TABLE music CONVERT TO CHARACTER SET utf8mb4; -- 设置数据库编码我为utf8

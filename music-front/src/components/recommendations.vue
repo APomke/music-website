@@ -54,7 +54,7 @@ export default {
         return {
             recommendations: [
             ],
-            audio: new Audio(require('@/music/11.稻香.wav')),
+            audio: new Audio(),
             // 记录正在播放的音乐id
             musicid: null,
             // 当前音乐播放时间
@@ -303,7 +303,7 @@ export default {
 
 .recommendation-cover img {
     width: 100%;
-    height: auto;
+    height: 80%;
 }
 
 .recommendation-card:hover {
@@ -324,7 +324,6 @@ export default {
     /* 使背景透明 */
     border: none;
     cursor: pointer;
-    z-index: 1;
     transition: transform 0.3s;
 }
 
