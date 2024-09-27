@@ -54,7 +54,7 @@ public class UserController {
     }
     
     
-    @GetMapping("/getUserListByUsername")
+    @GetMapping("/user//getUserListByUsername")
     public ResponseVO getUserListByUsername(String username) {
         ResponseVO responseVO = new ResponseVO();
         

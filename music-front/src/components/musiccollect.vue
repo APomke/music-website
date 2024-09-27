@@ -27,21 +27,30 @@
 </template>
 
 <script>
+import collectapi from '@/api/collect'
 export default {
     data() {
         return {
-            songs: [
-                { id: 1, title: '音乐标题1', artist: '艺术家1', url: '../music/11.稻香.wav', iconurl: "https://awsimage-1.oss-cn-hangzhou.aliyuncs.com/image-20240920091824796.png", isPlaying: false },
-                { id: 2, title: '音乐标题2', artist: '艺术家2', isPlaying: false },
-                // 添加更多歌曲...
-            ]
+            songs: []
         }
     },
     methods: {
+        // 发送请求，获取用户收藏数据
+        handleGetCollectList() {
+            collectapi.get_collect(this.$store.state.userinfo.uid).then(response => {
+                this.songs = response.data.data;
+                console.log(response);
+            }).catch(error => {
+                console.error(error);
+            });
+        },
         playSong(index) {
             console.log(`Playing song at index ${index}`);
             // 这里可以调用播放歌曲的方法或者API
         }
+    },
+    created() {
+        this.handleGetCollectList();
     }
 }
 </script>

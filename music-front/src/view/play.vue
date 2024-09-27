@@ -3,8 +3,15 @@
         <div class="login" @click="showLoginModal = true" v-if="!userInfo">
             <button>登录</button>
         </div>
-        <div class="userinfo" v-if="userInfo">
+        <div class="userinfo" v-if="userInfo" @mouseenter="showDropdown = true" @mouseleave="showDropdown = false">
             <img :src="userInfo.avatar_url" />
+            <div class="dropdown" v-show="showDropdown">
+                <div class="user-info">
+                    <p>{{ userInfo.username }}</p>
+                    <p>{{ userInfo.email }}</p>
+                </div>
+                <button @click="logout">退出登录</button>
+            </div>
         </div>
         <transition name="fade">
             <div class="login-modal" v-if="showLoginModal">
@@ -49,7 +56,6 @@ import recommendations from '../components/recommendations.vue'
 import progressbar from '../components/progressbar.vue'
 import musicinfo from '../components/musicinfo.vue'
 import musiccollect from '../components/musiccollect.vue'
-
 import userapi from '@/api/user'
 
 
@@ -67,7 +73,8 @@ export default {
             showLoginModal: false,
             username: null,
             password: null,
-            userInfo: null
+            userInfo: null,
+            showDropdown: false
         }
     },
     methods: {
@@ -81,6 +88,8 @@ export default {
                 this.userInfo = response.data.data
                 // 将返回的用户信息保存到 sessionStorage
                 sessionStorage.setItem('userInfo', JSON.stringify(response.data.data));
+                // 把用户信息保存到vuex
+                this.$store.commit("saveUserInfo",this.userInfo)
             }).catch(error => {
                 console.error(error);
             });
@@ -90,6 +99,9 @@ export default {
         logout() {
             // 清除 userInfo
             sessionStorage.removeItem('userInfo');
+            // 重新加载网页或者让页面动态刷新
+            // 重新加载网页
+            location.reload();
         }
     },
     created() {
@@ -97,6 +109,8 @@ export default {
         const savedUserInfo = sessionStorage.getItem('userInfo');
         if (savedUserInfo) {
             this.userInfo = JSON.parse(savedUserInfo);
+            // 把用户信息保存到vuex
+            this.$store.commit("saveUserInfo",this.userInfo)
             console.log('从 sessionStorage 读取用户信息:', this.userInfo);
         }
     }
@@ -120,6 +134,54 @@ button[type="submit"]:hover {
     background-color: #2ab300;
 }
 
+
+.dropdown {
+    position: absolute;
+    /* 绝对定位 */
+    top: 220%;
+    /* 在头像下方 */
+    left: 50%;
+    /* 居中对齐 */
+    transform: translateX(-50%);
+    /* 水平居中 */
+    background-color: #fff;
+    /* 背景颜色 */
+    border: 1px solid #ccc;
+    /* 边框 */
+    border-radius: 5px;
+    /* 圆角 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* 阴影 */
+    padding: 10px;
+    min-width: 150px;
+    /* 最小宽度 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1000;
+    /* 确保下拉菜单位于最顶层 */
+}
+
+.dropdown .user-info {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.dropdown button {
+    background-color: #48c95e;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.dropdown button:hover {
+    background-color: #319542;
+}
+
 .container {
     display: flex;
     flex-direction: column;
@@ -141,13 +203,59 @@ button[type="submit"]:hover {
     }
 
     .userinfo {
+        position: absolute;
+        top: 20px;
+        /* 距离顶部的距离 */
+        right: 90px;
+        /* 距离右边的距离 */
         display: flex;
-        justify-content: end;
-        padding: 10px;
-        img {
-            width: 8%;
-            height: 8%;
-        }
+        justify-content: center;
+        /* 水平居中 */
+        align-items: center;
+        /* 垂直居中 */
+        width: 20px;
+        /* 宽度 */
+        height: 20px;
+        /* 高度 */
+        background-color: #f8f9fa;
+        /* 背景颜色 */
+        border: 1px solid #dee2e6;
+        /* 边框 */
+        border-radius: 50%;
+        /* 圆形边框 */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        /* 添加阴影 */
+        transition: transform 0.3s, box-shadow 0.3s;
+        /* 平滑过渡 */
+    }
+
+    .userinfo:hover {
+        transform: scale(1.05);
+        /* 悬停时放大 */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        /* 悬停时加深阴影 */
+    }
+
+    .userinfo img {
+        border-radius: 50%;
+        /* 使头像呈圆形 */
+        width: 60px;
+        /* 头像的宽度 */
+        height: 60px;
+        /* 头像的高度 */
+        object-fit: cover;
+        /* 保持图片的纵横比并覆盖整个区域 */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        /* 添加阴影 */
+        transition: transform 0.3s, box-shadow 0.3s;
+        /* 平滑过渡 */
+    }
+
+    .userinfo img:hover {
+        transform: scale(1.1);
+        /* 悬停时放大 */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        /* 悬停时加深阴影 */
     }
 
     .login button {
@@ -197,9 +305,10 @@ button[type="submit"]:hover {
 
     .modal-content {
         background-color: #ffffff;
+        justify-content: center;
         margin: 15% auto;
         padding: 20px;
-        border-radius: 10px;
+        border-radius: 20px;
         /* 较大的圆角 */
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         /* 阴影效果 */
@@ -259,6 +368,6 @@ button[type="submit"]:hover {
     .fade-leave-to {
         opacity: 0;
     }
-    
+
 }
 </style>

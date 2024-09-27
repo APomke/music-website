@@ -5,6 +5,9 @@
         <div class="music-img">
             <img :src="this.$store.state.music.icon_url">
         </div>
+        <div>
+            <button class="collect-btn">收藏</button>
+        </div>
         <!--右侧歌词-->
         <div class="music-lyric">
             <!--歌名-->
@@ -106,6 +109,7 @@ export default {
     margin: 0 auto;
     /* 居中 */
 }
+
 
 .music-img {
     position: relative;

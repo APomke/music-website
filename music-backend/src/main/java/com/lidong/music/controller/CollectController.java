@@ -6,12 +6,13 @@ import com.lidong.music.entity.Collect;
 import com.lidong.music.service.CollectService;
 import com.lidong.music.entity.ResponseVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
+@CrossOrigin
+@RequestMapping("/collect")
 public class CollectController {
 
     @Autowired

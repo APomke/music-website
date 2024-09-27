@@ -24,7 +24,8 @@ export default new Vuex.Store({
         // 要修改播放进度的时间
         updateCurrentTime: 0,
         // 音乐封面小图标url
-        musicicon: null
+        musicicon: null,
+        userinfo: null
     },
     mutations: {
         // 保存进度条播放按钮状态
@@ -58,6 +59,10 @@ export default new Vuex.Store({
         },
         saveMusicId(state,id){
             state.musicid = id
+        },
+        // 保存用户信息
+        saveUserInfo(state,userinfo) {
+            state.userinfo = userinfo
         }
     },
     actions: {
