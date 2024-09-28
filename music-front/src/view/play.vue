@@ -198,6 +198,9 @@ button[type="submit"]:hover {
     .login {
         display: flex;
         justify-content: end;
+        position: absolute;
+        right: 90px;
+        /* 距离右边的距离 */
         padding: 10px;
         /* 可以调整padding以增加或减少按钮周围的空白 */
     }

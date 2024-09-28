@@ -3,20 +3,25 @@ package com.lidong.music.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lidong.music.entity.Collect;
+import com.lidong.music.entity.User;
 import com.lidong.music.service.CollectService;
 import com.lidong.music.entity.ResponseVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/collect")
 public class CollectController {
 
     @Autowired
     private CollectService collectService;
+
+    @Autowired
+    HttpServletRequest request;
     
     // 查询
     
@@ -43,6 +48,19 @@ public class CollectController {
         responseVO.setInfo("查询成功！");
         responseVO.setStatus("success");
         responseVO.setData(collectList);
+        return responseVO;
+    }
+
+    @PostMapping("/CollectMusic")
+    public ResponseVO collectMusic(HttpSession session, @RequestBody Collect collect) {
+        ResponseVO responseVO = new ResponseVO();
+        // 把music对象转为collect对象
+
+        // 通过session获取uid
+        // 从 session 中获取用户信息
+        Object userInfo = session.getAttribute("userInfo");
+        System.out.println("获取的用户信息为：" + userInfo.toString());
+        responseVO.setCode(200);
         return responseVO;
     }
     

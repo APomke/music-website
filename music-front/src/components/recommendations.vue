@@ -87,10 +87,6 @@ export default {
                 // 设置播放时长
                 this.duration = this.formatTime(this.audio.duration)
             }
-            // this.$store.commit("saveAudio", this.audio)
-            // this.$store.commit("saveMusicId", id)
-            // this.$store.commit("saveCurrentTime",0)
-
             var tableroute = [
                 { isIndex: false },
                 { isMusicInfo: true },

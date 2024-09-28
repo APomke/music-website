@@ -8,10 +8,11 @@ import com.lidong.music.entity.ResponseVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
-@CrossOrigin
 public class UserController {
 
     @Autowired
@@ -20,7 +21,7 @@ public class UserController {
     // 查询
     // 登录
     @PostMapping("/user/login")
-    public ResponseVO login(@RequestBody User user) {
+    public ResponseVO login(@RequestBody User user, HttpSession session) {
         ResponseVO responseVO = new ResponseVO();
         List<User> userList = userService.getUserListByUsername(user.getUsername());
         if (!userList.isEmpty()) {
@@ -30,6 +31,9 @@ public class UserController {
                 responseVO.setInfo("密码验证成功！");
                 responseVO.setStatus("success");
                 responseVO.setData(user1);
+                // 将用户信息保存到 session 中
+                session.setAttribute("userInfo", user1);
+                System.out.printf("保存sessiob："+user1);
             }
         }else {
             responseVO.setCode(403);
