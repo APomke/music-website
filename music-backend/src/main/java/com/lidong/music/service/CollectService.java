@@ -37,10 +37,17 @@ public interface CollectService extends IService<Collect> {
     // 修改
     int updateCollect(Collect collect);
     
-    // 增加
+    // 增加收藏音乐
     int addCollect(Collect collect);
     
     // 删除
     int deleteCollect(String id);
+
+    // 判断用户是否已收藏该音乐
+    boolean isCollect(String title,String uid);
+
+    // 取消指定用户的指定收藏音乐
+    boolean unCollect(String title, String uid);
+
     
 }

@@ -3,9 +3,12 @@ package com.lidong.music.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lidong.music.entity.Collect;
+import com.lidong.music.entity.Music;
 import com.lidong.music.entity.User;
 import com.lidong.music.service.CollectService;
 import com.lidong.music.entity.ResponseVO;
+import com.lidong.music.utils.StringTools;
+import com.mysql.cj.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,17 +53,64 @@ public class CollectController {
         responseVO.setData(collectList);
         return responseVO;
     }
-
+    // 收藏音乐
     @PostMapping("/CollectMusic")
-    public ResponseVO collectMusic(HttpSession session, @RequestBody Collect collect) {
+    public ResponseVO collectMusic(HttpSession session, @RequestBody Music music) {
         ResponseVO responseVO = new ResponseVO();
         // 把music对象转为collect对象
 
         // 通过session获取uid
         // 从 session 中获取用户信息
-        Object userInfo = session.getAttribute("userInfo");
-        System.out.println("获取的用户信息为：" + userInfo.toString());
-        responseVO.setCode(200);
+        User userInfo = (User) session.getAttribute("userInfo");
+//        System.out.println("获取的用户信息为：" + userInfo.toString());
+        System.out.println("获取的音乐对象：" + music.toString());
+
+        Collect collect = new Collect();
+        collect.setId(StringTools.getRandomUUID());
+        collect.setUid(userInfo.getUid());
+        collect.setMusic_title(music.getTitle());
+        collect.setUrl(music.getUrl());
+        collect.setMusic_artist(music.getArtist());
+        collect.setIcon_url(music.getIcon_url());
+        collect.setLevel(music.getLevel());
+        int i = collectService.addCollect(collect);
+        System.out.printf(String.valueOf(i));
+        if (i > 0) {
+            responseVO.setCode(200);
+            responseVO.setInfo("收藏成功");
+        }else {
+            responseVO.setCode(500);
+            responseVO.setInfo("收藏失败");
+        }
+        return responseVO;
+    }
+
+    // 判断用户是否收藏指定音乐
+    @GetMapping("/isCollect")
+    public ResponseVO isCollect(String music_title,HttpSession session) {
+        ResponseVO responseVO = new ResponseVO();
+        System.out.println("获取的音乐为：" + music_title);
+        // 从 session 中获取用户信息
+        User userInfo = (User) session.getAttribute("userInfo");
+        if (collectService.isCollect(music_title,userInfo.getUid())) {
+            responseVO.setCode(200);
+            responseVO.setInfo("音乐已被收藏");
+        }else {
+            responseVO.setCode(201);
+            responseVO.setInfo("音乐未被收藏");
+        }
+        return responseVO;
+    }
+    // 取消收藏指定音乐
+    @GetMapping("/unCollect")
+    public ResponseVO unCollect(String music_title,HttpSession session) {
+        ResponseVO responseVO = new ResponseVO();
+        User userInfo = (User) session.getAttribute("userInfo");
+        if (collectService.unCollect(music_title,userInfo.getUid())) {
+            responseVO.setCode(200);
+        }else {
+            responseVO.setCode(500);
+        }
         return responseVO;
     }
     

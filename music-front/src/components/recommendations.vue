@@ -114,7 +114,6 @@ export default {
                 // this.$store.commit("savePlayStatus", false);
                 this.$store.commit("saveMusicIcon", this.recommendations[id ? this.recommendations.findIndex(item => item.id === id) : index].icon_url)
                 // 保存音乐 audio到vuex
-                // this.$store.commit("saveAudio", this.audio)
                 this.audio.src = this.recommendations[index].url;
                 this.$store.commit("saveAudio", this.audio)
                 this.$store.commit("saveMusicId", id)

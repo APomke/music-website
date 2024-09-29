@@ -1,4 +1,5 @@
 import axios from 'axios';
+
  
 
 
@@ -24,5 +25,21 @@ export default {
   // 收藏指定音乐
   collect_music(music) {
     return apiClient.post('/collect/CollectMusic',music)
+  },
+  // 判断用户是否已收藏指定音乐
+  is_collect(music_title) {
+    return apiClient.get('/collect/isCollect',{
+      params: {
+        music_title: music_title
+      }
+    })
+  },
+  // 取消收藏指定音乐
+  un_collect(music_title) {
+    return apiClient.get('/collect/unCollect',{
+      params: {
+        music_title: music_title
+      }
+    })
   }
 }

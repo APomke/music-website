@@ -1,9 +1,5 @@
 server:
   port: 8081 # 设置项目启动端口
-  servlet:
-    session:
-      cookie:
-        secure: true
 spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # 排除DataSource自动配置

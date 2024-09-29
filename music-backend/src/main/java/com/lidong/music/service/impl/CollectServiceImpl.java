@@ -19,7 +19,8 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect> impl
     public Collect getCollect(int id) {
         return collectMapper.selectById(id);
     }
-    
+
+    //
     
     @Override
     
@@ -100,4 +101,27 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect> impl
     public int deleteCollect(String id) {
         return collectMapper.deleteById(id);
     }
+
+    // 判断用户是否收藏该音乐
+    @Override
+    public boolean isCollect(String title, String uid) {
+        QueryWrapper<Collect> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("music_title",title).eq("uid",uid);
+        List<Collect> collects = collectMapper.selectList(queryWrapper);
+        if (!collects.isEmpty()){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    // 取消指定用户的指定收藏音乐
+    @Override
+    public boolean unCollect(String title, String uid) {
+        QueryWrapper<Collect> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("music_title",title).eq("uid",uid);
+        return collectMapper.delete(queryWrapper) > 0;
+    }
+
+
 }
