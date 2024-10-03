@@ -68,7 +68,7 @@ public class CollectController {
         Collect collect = new Collect();
         collect.setId(StringTools.getRandomUUID());
         collect.setUid(userInfo.getUid());
-        collect.setMusic_title(music.getTitle());
+        collect.setTitle(music.getTitle());
         collect.setUrl(music.getUrl());
         collect.setMusic_artist(music.getArtist());
         collect.setIcon_url(music.getIcon_url());

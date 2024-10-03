@@ -25,7 +25,9 @@ export default new Vuex.Store({
         updateCurrentTime: 0,
         // 音乐封面小图标url
         musicicon: null,
-        userinfo: null
+        userinfo: null,
+        // 当前歌单
+        musicList: null
     },
     mutations: {
         // 保存进度条播放按钮状态
@@ -63,6 +65,10 @@ export default new Vuex.Store({
         // 保存用户信息
         saveUserInfo(state,userinfo) {
             state.userinfo = userinfo
+        },
+        // 保存新的当前歌单
+        saveMusicList(state,musicList) {
+            state.musicList = musicList
         }
     },
     actions: {

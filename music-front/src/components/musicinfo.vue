@@ -157,7 +157,7 @@ export default {
         // 取消收藏
         uncollect() {
             collectapi.un_collect(this.$store.state.music.title).then(response => {
-                console.log("取消收藏")
+                // console.log("取消收藏")
                 this.isCollect = false;
             }).catch(err => {
                 console.error(err);
@@ -166,22 +166,32 @@ export default {
         // 收藏音乐
         collect() {
             // console.log("点击了收藏按钮")
-            // console.log("当前页面音乐id为:",this.$store.state.music)
-            collectapi.collect_music(this.$store.state.music).then(response => {
-                console.log(response);
-                this.isCollect = true;
-            }).catch(error => {
-                console.error(error);
-            });
+            // 判断用户是否登录
+            const savedUserInfo = sessionStorage.getItem('userInfo');
+            if (savedUserInfo) {
+                // console.log("当前页面音乐id为:",this.$store.state.music)
+                collectapi.collect_music(this.$store.state.music).then(response => {
+                    // console.log(response);
+                    this.isCollect = true;
+                }).catch(error => {
+                    console.error(error);
+                });
+            } else {
+                this.$notify({
+                    title: '请先登录',
+                    message: '请先登录',
+                    type: 'warning'
+                });
+            }
 
         },
         // 判断该音乐是否已收藏
         handleIsCollect() {
             collectapi.is_collect(this.$store.state.music.title).then(response => {
-                console.log("判断音乐是否已被收藏", response)
+                // console.log("判断音乐是否已被收藏", response)
                 if (response.data.code == 200) {
                     this.isCollect = true;
-                    console.log("修改收藏按钮状态")
+                    // console.log("修改收藏按钮状态")
                 }
             })
         },
@@ -189,13 +199,17 @@ export default {
     created() {
         this.audio = this.$store.state.audio
         this.getLyric()
-        console.log("获取音乐信息：", this.$store.state.music)
+        // console.log("获取音乐信息：", this.$store.state.music)
         if (this.$store.state.music) {
             this.isDefaultView = true
         } else {
             console.log("未获取到音乐信息,显示默认视图")
         }
-        this.handleIsCollect();
+        // 判断用户是否登入登入
+        const savedUserInfo = sessionStorage.getItem('userInfo');
+        if (savedUserInfo) {
+            this.handleIsCollect();
+        }
     },
     watch: {
         // 监控进度条播放按钮状态
@@ -248,7 +262,6 @@ export default {
 </script>
 
 <style>
-
 /* 设置进入动画的持续时间和函数 */
 .zoom-enter-active {
     transition: transform .2s ease, opacity .1s ease;

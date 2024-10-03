@@ -85,20 +85,36 @@ export default {
                 password: this.password
             }
             userapi.login(user).then(response => {
-                this.userInfo = response.data.data
-                // 将返回的用户信息保存到 sessionStorage
-                sessionStorage.setItem('userInfo', JSON.stringify(response.data.data));
-                // 把用户信息保存到vuex
-                this.$store.commit("saveUserInfo",this.userInfo)
+                if (response.data.code == 403) {
+                    this.$notify.error({
+                        title: '登录失败',
+                        message: response.data.info
+                    });
+                } else {
+                    this.userInfo = response.data.data
+                    // 将返回的用户信息保存到 sessionStorage
+                    sessionStorage.setItem('userInfo', JSON.stringify(response.data.data));
+                    // 把用户信息保存到vuex
+                    // this.$store.commit("saveUserInfo", this.userInfo)
+                    // 关闭模态框
+                    this.showLoginModal = false;
+
+                    this.$notify({
+                        title: '登录成功',
+                        message: "登录成功",
+                        type: 'success'
+                    });
+                }
+
             }).catch(error => {
                 console.error(error);
+
             });
-            // 关闭模态框
-            this.showLoginModal = false;
         },
         logout() {
             // 清除 userInfo
             sessionStorage.removeItem('userInfo');
+            this.$store.commit("saveUserInfo", null);
             // 重新加载网页或者让页面动态刷新
             // 重新加载网页
             location.reload();
@@ -110,8 +126,8 @@ export default {
         if (savedUserInfo) {
             this.userInfo = JSON.parse(savedUserInfo);
             // 把用户信息保存到vuex
-            this.$store.commit("saveUserInfo",this.userInfo)
-            console.log('从 sessionStorage 读取用户信息:', this.userInfo);
+            // this.$store.commit("saveUserInfo", this.userInfo)
+            // console.log('从 sessionStorage 读取用户信息:', this.userInfo);
         }
     }
 }

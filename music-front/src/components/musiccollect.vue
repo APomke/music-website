@@ -7,7 +7,7 @@
                     <div class="small-icons">
                         <img :src="song.icon_url">
                     </div>
-                    <span class="music-name">{{ song.music_title }}</span>
+                    <span class="music-name">{{ song.title }}</span>
                     <span class="music-artist">— {{ song.music_artist }}</span>
                 </div>
                 <button @click="playSong(song.id)" class="play-buttons">
@@ -54,27 +54,39 @@ export default {
     },
     methods: {
         // 发送请求，获取用户收藏数据
-        handleGetCollectList() {
-            collectapi.get_collect(this.$store.state.userinfo.uid).then(response => {
-                this.songs = response.data.data;
-                console.log(response);
-                // 为每个song添加一个playing字段默认为false
-                // 使用 map 函数遍历数组并返回新的数组
-                this.songs = this.songs.map(song => ({
-                    ...song, // 复制原有对象
-                    playing: false // 添加新的字段
-                }));
-                this.initPlay();
-                this.isLoding = true;
-            }).catch(error => {
-                console.error(error);
-            });
+        async handleGetCollectList() {
+            const savedUserInfo = sessionStorage.getItem('userInfo');
+            if (savedUserInfo) {
+                // 从session里取出用户uid
+                const uid = JSON.parse(savedUserInfo).uid;
+                // console.log(uid)
+                await collectapi.get_collect(uid).then(response => {
+                    this.songs = response.data.data;
+                    // console.log(response);
+                    // 为每个song添加一个playing字段默认为false
+                    // 使用 map 函数遍历数组并返回新的数组
+                    this.songs = this.songs.map(song => ({
+                        ...song, // 复制原有对象
+                        playing: false // 添加新的字段
+                    }));
+                    this.initPlay();
+                    this.isLoding = true;
+                }).catch(error => {
+                    console.error(error);
+                });
+            } else {
+                this.$notify({
+                    title: '请先登录',
+                    message: '请先登录',
+                    type: 'warning'
+                });
+            }
         },
         playSong(id) {
             // 这里可以调用播放歌曲的方法或者API
             // 找到对应的音乐卡片
             const index = this.songs.findIndex(item => item.id === id);
-            console.log(index)
+            // console.log(index)
             // 如果音乐id不是之前保存的或者音乐id为null
             if (this.$store.state.musicid !== id || this.$store.state.musicid == null) {
                 this.$store.commit("saveMusicIcon", this.songs[index].icon_url)
@@ -85,6 +97,8 @@ export default {
                 this.songs[index].playing = false;
                 // 设置播放时长
                 this.duration = this.formatTime(this.audio.duration)
+                // 把收藏表单存放到vuex的当前表单
+                this.$store.commit("saveMusicList", this.songs);
             }
             // 改变对应的音乐卡片按钮的svg播放图标
             this.songs[index].playing = !this.songs[index].playing;
@@ -112,7 +126,7 @@ export default {
         },
         updatePlayStyle(newVal) {
             // 修改对应的播放按钮样式
-            const index = this.songs.findIndex(item => item.music_title === this.$store.state.music.title);
+            const index = this.songs.findIndex(item => item.title === this.$store.state.music.title);
             // 改变对应的音乐卡片按钮的svg播放图标
             this.songs[index].playing = newVal;
         },
@@ -120,14 +134,19 @@ export default {
         initPlay() {
             if (this.$store.state.musicid && this.$store.state.playstatus) {
                 // 修改对应的播放按钮样式
-                const index = this.songs.findIndex(item => item.music_title === this.$store.state.music.title);
+                const index = this.songs.findIndex(item => item.title === this.$store.state.music.title);
                 // 改变对应的音乐卡片按钮的svg播放图标
                 this.songs[index].playing = true;
 
             }
         },
+        handleAudioEnd(event) {
+            console.log('Audio has ended.');
+            // 执行你想在移除音频结束监听器后做的操作
+        }
     },
     created() {
+        this.audio = this.$store.state.audio;
         this.handleGetCollectList();
     },
     watch: {
@@ -177,13 +196,52 @@ export default {
             this.$store.commit("saveCurrentTime", this.$store.state.audio.currentTime)
             // console.log("当前音乐播放时间:", this.currentTime)
         });
-
         // 监听音频播放结束
-        this.audio.addEventListener('ended', () => {
-            console.log('音频播放结束');
-            this.currentTime = 0;
+        this.audio.addEventListener('ended', async () => {
+            // console.log('音频播放结束');
+            // 播放下一首
+            const currentIndex = this.$store.state.musicList.findIndex(item => item.id === this.$store.state.musicid);
+            let index = parseInt(currentIndex + 1);
+            if (this.$store.state.musicList[index]) {
+                this.audio.src = this.$store.state.musicList[index].url;
+                // 设置播放时长
+                this.duration = this.formatTime(this.audio.duration)
+                this.$store.commit("saveAudio", this.audio)
+                this.$store.commit("saveMusicInfo", this.$store.state.musicList[index]);
+                this.$store.commit("saveCurrentTime", 0)
+                await this.$store.state.audio.pause();
+
+                this.$store.state.audio.play()
+                // 重置播放图标
+
+
+                // 保存音乐id
+                this.musicid = this.$store.state.musicList[index].id;
+                this.$store.commit("saveMusicId", this.musicid)
+                // 改变对应的音乐卡片按钮的svg播放图标
+                this.songs[currentIndex].playing = false;
+                // 更换进度条小图标
+                this.$store.commit("saveMusicIcon", this.$store.state.musicList[index].icon_url)
+                this.updatePlayStyle(true);
+            } else {
+                this.$notify({
+                    title: '歌单已没有下一首歌曲',
+                    message: '歌单已没有下一首歌曲',
+                    type: 'warning'
+                });
+            }
         });
     },
+    // 在页面离开时
+    beforeDestroy() {
+        if (this.$store.state.musicList == this.songs) {
+            console.log("当前歌单为收藏歌单");
+        } else {
+            // 如果当前歌单不是收藏歌单
+            // 卸载音频结束监听器
+            this.audio.removeEventListener('ended',this.handleAudioEnd);
+        }
+    }
 }
 </script>
 

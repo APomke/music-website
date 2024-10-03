@@ -4,7 +4,7 @@
             推荐音乐
         </div>
         <div class="recommendations-body">
-            <div class="recommendation-card" v-for="(recommendation) in recommendations" :key="recommendation.id" 
+            <div class="recommendation-card" v-for="(recommendation) in recommendations" :key="recommendation.id"
                 @click="handleCardClick(recommendation.id)">
                 <div class="recommendation-cover">
                     <img :src="recommendation.icon_url" alt="">
@@ -83,7 +83,7 @@ export default {
                 this.audio.src = music.url;
                 this.$store.dispatch('setAudioSrc', music.url);
                 this.$store.commit("saveMusicId", id)
-                this.$store.commit("saveCurrentTime",0)
+                this.$store.commit("saveCurrentTime", 0)
                 // 设置播放时长
                 this.duration = this.formatTime(this.audio.duration)
             }
@@ -94,10 +94,11 @@ export default {
             ]
             this.$store.commit("saveTableRoute", tableroute)
         },
-        getRecommedations() {
-            api.getRecommendationsMusic().then(response => {
+        async getRecommedations() {
+            await api.getRecommendationsMusic().then(response => {
                 // console.log(response.data)
-                this.recommendations = response.data.data
+                this.recommendations = response.data.data;
+                this.initPlay();
             }).catch(error => {
                 console.error(error);
             });
@@ -141,6 +142,8 @@ export default {
                 // 保存音乐id
                 this.musicid = id
                 this.updatePlayStyle(true);
+                // 把推荐歌单保存到vux的当前歌单里
+                this.$store.commit("saveMusicList", this.recommendations);
             } else {
                 // 暂停播放
                 // this.audio.pause();
@@ -158,9 +161,11 @@ export default {
         // 从vuex里读取当前播放音乐的id，以便重新进入这个页面的时候改变对应的播放按钮样式
         initPlay() {
             if (this.$store.state.musicid && this.$store.state.playstatus) {
+                console.log("开始改变样式")
                 // 修改对应的播放按钮样式
                 const index = this.recommendations.findIndex(item => item.id === this.$store.state.musicid);
                 // 改变对应的音乐卡片按钮的svg播放图标
+
                 this.recommendations[index].playing = true;
 
             }
@@ -170,12 +175,16 @@ export default {
             const index = this.recommendations.findIndex(item => item.id === this.$store.state.musicid);
             // 改变对应的音乐卡片按钮的svg播放图标
             this.recommendations[index].playing = newVal;
+        },
+        handleAudioEnd(event) {
+            console.log('Audio has ended.');
+            // 执行你想在移除音频结束监听器后做的操作
         }
     },
     created() {
         this.getRecommedations()
         // console.log(this.recommendations)
-        this.initPlay()
+        // this.initPlay()
     },
     watch: {
         // 全局播放状态
@@ -226,11 +235,51 @@ export default {
         });
 
         // 监听音频播放结束
-        this.audio.addEventListener('ended', () => {
+        this.audio.addEventListener('ended', async () => {
             console.log('音频播放结束');
-            this.currentTime = 0;
+            // 播放下一首
+            const currentIndex = this.$store.state.musicList.findIndex(item => item.id === this.$store.state.musicid);
+            let index = parseInt(currentIndex + 1);
+            if (this.$store.state.musicList[index]) {
+                this.audio.src = this.$store.state.musicList[index].url;
+                // 设置播放时长
+                this.duration = this.formatTime(this.audio.duration)
+                this.$store.commit("saveAudio", this.audio)
+                this.$store.commit("saveMusicInfo", this.$store.state.musicList[index]);
+                this.$store.commit("saveCurrentTime", 0)
+                await this.$store.state.audio.pause();
+
+                this.$store.state.audio.play()
+                // 重置播放图标
+
+
+                // 保存音乐id
+                this.musicid = this.$store.state.musicList[index].id;
+                this.$store.commit("saveMusicId", this.musicid)
+                // 改变对应的音乐卡片按钮的svg播放图标
+                this.recommendations[currentIndex].playing = false;
+                // 更换进度条小图标
+                this.$store.commit("saveMusicIcon", this.$store.state.musicList[index].icon_url)
+                this.updatePlayStyle(true);
+            } else {
+                this.$notify({
+                    title: '歌单已没有下一首歌曲',
+                    message: '歌单已没有下一首歌曲',
+                    type: 'warning'
+                });
+            }
         });
     },
+    // 在页面离开时
+    beforeDestroy() {
+        if (this.$store.state.musicList == this.recommendations) {
+            console.log("当前歌单为推荐歌单");
+        } else {
+            // 如果当前歌单不是收藏歌单
+            // 卸载音频结束监听器
+            this.audio.removeEventListener('ended', this.handleAudioEnd);
+        }
+    }
 };  
 </script>
 

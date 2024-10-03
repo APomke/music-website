@@ -17,7 +17,7 @@ public class Collect {
     
     private String id;
     private String uid;
-    private String music_title;
+    private String title;
     private String music_artist;
     private String url;
     private String icon_url;
