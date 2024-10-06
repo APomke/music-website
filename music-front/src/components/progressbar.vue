@@ -87,13 +87,15 @@
 </template>
 
 <script>
+import eventBus from '@/utils/eventBus';
 export default {
     data() {
         return {
             // playstatus: false,
             value1: 0,
             currentTime: 0,
-            duration: 0
+            duration: 0,
+            audio: new Audio(),
 
         }
     },
@@ -132,15 +134,110 @@ export default {
             // this.$store.state.currentTime = val;
             this.$store.commit("saveUpdateCurrentTime", val)
         },
-        backbutton() {
+        async backbutton() {
             console.log("点击了上一首按钮")
+            // 播放上一首
+            const currentIndex = this.$store.state.musicList.findIndex(item => item.id === this.$store.state.musicid);
+            let index = parseInt(currentIndex - 1);
+            if (this.$store.state.musicList[index]) {
+                this.$store.state.audio.pause();
+                // 保存音乐id
+                const musicid = this.$store.state.musicList[index].id;
+                this.$store.commit("saveMusicId", musicid)
+
+                this.audio.src = this.$store.state.musicList[index].url;
+
+                this.$store.commit("saveMusicInfo", this.$store.state.musicList[index]);
+                this.duration = this.formatTime(this.audio.duration)
+                // 更换进度条小图标
+                this.$store.commit("saveMusicIcon", this.$store.state.musicList[index].icon_url)
+
+
+                // this.$store.state.audio.play()
+                this.timer = setTimeout(() => {
+                    this.$store.commit("saveCurrentTime", 0)
+                    this.$store.commit("saveAudio", this.audio)
+                    this.$store.state.audio.play();
+
+                }, 500);
+
+                // 重新加载网页
+                // location.reload();
+
+                // // 重置播放图标
+
+
+                // // 改变对应的音乐卡片按钮的svg播放图标
+                eventBus.$emit('changeUpIndex', currentIndex);
+
+                // // this.recommendations[currentIndex].playing = false;
+
+                // // this.updatePlayStyle(true);
+            } else {
+                this.$notify({
+                    title: '歌单已没有上一首歌曲',
+                    message: '歌单已没有上一首歌曲',
+                    type: 'warning'
+                });
+            }
+
         },
-        nextbutton() {
+        async nextbutton() {
             console.log("点击了下一首按钮")
-            console.log(this.$store.state.musicicon)
+            // 播放下一首
+            const currentIndex = this.$store.state.musicList.findIndex(item => item.id === this.$store.state.musicid);
+            let index = parseInt(currentIndex + 1);
+            if (this.$store.state.musicList[index]) {
+                this.$store.state.audio.pause();
+                // 保存音乐id
+                const musicid = this.$store.state.musicList[index].id;
+                this.$store.commit("saveMusicId", musicid)
+
+                this.audio.src = this.$store.state.musicList[index].url;
+
+                this.$store.commit("saveMusicInfo", this.$store.state.musicList[index]);
+                this.duration = this.formatTime(this.audio.duration)
+                // 更换进度条小图标
+                this.$store.commit("saveMusicIcon", this.$store.state.musicList[index].icon_url)
+
+
+                // this.$store.state.audio.play()
+                this.timer = setTimeout(() => {
+                    this.$store.commit("saveCurrentTime", 0)
+                    this.$store.commit("saveAudio", this.audio)
+                    this.$store.state.audio.play();
+
+                }, 500);
+
+                // 重新加载网页
+                // location.reload();
+
+                // // 重置播放图标
+
+
+                // // 改变对应的音乐卡片按钮的svg播放图标
+                eventBus.$emit('changeIndex', currentIndex);
+
+                // // this.recommendations[currentIndex].playing = false;
+
+                // // this.updatePlayStyle(true);
+            } else {
+                this.$notify({
+                    title: '歌单已没有下一首歌曲',
+                    message: '歌单已没有下一首歌曲',
+                    type: 'warning'
+                });
+            }
         }
     },
     mounted() {
+        // 监听音频播放状态变化
+        this.audio.addEventListener('timeupdate', () => {
+            // this.currentTime = this.formatTime(this.audio.currentTime);
+            // 保存到vux
+            this.$store.commit("saveCurrentTime", this.$store.state.audio.currentTime)
+
+        });
     },
 }  
 </script>

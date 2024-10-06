@@ -49,6 +49,9 @@
 
 <script>
 import api from '@/api/music'
+
+import eventBus from '@/utils/eventBus';
+
 export default {
     data() {
         return {
@@ -182,7 +185,8 @@ export default {
         }
     },
     created() {
-        this.getRecommedations()
+        this.getRecommedations();
+        this.audio = this.$store.state.audio;
         // console.log(this.recommendations)
         // this.initPlay()
     },
@@ -194,23 +198,7 @@ export default {
                 this.updatePlayStyle(newVal)
             }
         },
-        // 监控进度条播放按钮状态
-        "$store.state.music.playing": {
-            deep: true,//深度监听设置为 true
-            handler: function (newVal, oldVal) {
-                if (newVal) {
-                    //播放音乐
-                    this.$store.state.audio.play();
-                    // 修改vuex里的音乐状态
-                    this.$store.commit("updateMusicState", true)
-                } else {
-                    //暂停音乐
-                    this.$store.state.audio.pause();
-                    // 修改vuex里的音乐状态
-                    this.$store.commit("updateMusicState", false)
-                }
-            }
-        },
+        
         "$store.state.updateCurrentTime": {
             deep: true,
             handler: function (newVal, oldVal) {
@@ -225,10 +213,23 @@ export default {
 
     },
     mounted() {
+        //  接收到进度条组件的下一首请求，修改卡片播放按钮样式
+        eventBus.$on('changeIndex', target => {
+            this.updatePlayStyle(true);
+            this.recommendations[target].playing = false;
+        })
+
+        //  接收到进度条组件的上一首请求，修改卡片播放按钮样式
+        eventBus.$on('changeUpIndex', target => {
+            this.updatePlayStyle(true);
+            this.recommendations[target].playing = false;
+        })
+
+
 
         // 监听音频播放状态变化
         this.audio.addEventListener('timeupdate', () => {
-            this.currentTime = this.formatTime(this.audio.currentTime);
+            // this.currentTime = this.formatTime(this.audio.currentTime);
             // 保存到vux
             this.$store.commit("saveCurrentTime", this.$store.state.audio.currentTime)
             // console.log("当前音乐播放时间:",this.currentTime)
@@ -261,7 +262,7 @@ export default {
                 // 更换进度条小图标
                 this.$store.commit("saveMusicIcon", this.$store.state.musicList[index].icon_url)
                 this.updatePlayStyle(true);
-            } else {
+            } else if (this.$store.state.musicList == this.recommendations) {
                 this.$notify({
                     title: '歌单已没有下一首歌曲',
                     message: '歌单已没有下一首歌曲',

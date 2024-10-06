@@ -129,6 +129,9 @@ export default {
             // this.$store.commit("saveUserInfo", this.userInfo)
             // console.log('从 sessionStorage 读取用户信息:', this.userInfo);
         }
+    },
+    mounted() {
+
     }
 }
 
@@ -246,6 +249,7 @@ button[type="submit"]:hover {
         /* 添加阴影 */
         transition: transform 0.3s, box-shadow 0.3s;
         /* 平滑过渡 */
+        z-index: 999;
     }
 
     .userinfo:hover {

@@ -27,10 +27,10 @@ export default {
     return apiClient.post('/collect/CollectMusic',music)
   },
   // 判断用户是否已收藏指定音乐
-  is_collect(music_title) {
+  is_collect(title) {
     return apiClient.get('/collect/isCollect',{
       params: {
-        music_title: music_title
+        title: title
       }
     })
   },

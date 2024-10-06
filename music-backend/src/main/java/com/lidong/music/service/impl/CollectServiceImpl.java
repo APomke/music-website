@@ -43,7 +43,7 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect> impl
     
     public List<Collect> getCollectListByMusicTitle(String music_title) {
         QueryWrapper<Collect> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("musictitle",music_title);
+        queryWrapper.eq("title",music_title);
         return collectMapper.selectList(queryWrapper);
     }
     
@@ -106,7 +106,7 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect> impl
     @Override
     public boolean isCollect(String title, String uid) {
         QueryWrapper<Collect> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("music_title",title).eq("uid",uid);
+        queryWrapper.eq("title",title).eq("uid",uid);
         List<Collect> collects = collectMapper.selectList(queryWrapper);
         if (!collects.isEmpty()){
             return true;

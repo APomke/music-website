@@ -44,6 +44,7 @@
 
 <script>
 import collectapi from '@/api/collect'
+import eventBus from '@/utils/eventBus';
 export default {
     data() {
         return {
@@ -157,23 +158,6 @@ export default {
                 this.updatePlayStyle(newVal)
             }
         },
-        // 监控进度条播放按钮状态
-        "$store.state.music.playing": {
-            deep: true,//深度监听设置为 true
-            handler: function (newVal, oldVal) {
-                if (newVal) {
-                    //播放音乐
-                    this.$store.state.audio.play();
-                    // 修改vuex里的音乐状态
-                    this.$store.commit("updateMusicState", true)
-                } else {
-                    //暂停音乐
-                    this.$store.state.audio.pause();
-                    // 修改vuex里的音乐状态
-                    this.$store.commit("updateMusicState", false)
-                }
-            }
-        },
         "$store.state.updateCurrentTime": {
             deep: true,
             handler: function (newVal, oldVal) {
@@ -188,6 +172,17 @@ export default {
 
     },
     mounted() {
+        //  接收到进度条组件的下一首请求，修改卡片播放按钮样式
+        eventBus.$on('changeIndex', target => {
+            this.updatePlayStyle(true);
+            this.songs[target].playing = false;
+        })
+
+        //  接收到进度条组件的上一首请求，修改卡片播放按钮样式
+        eventBus.$on('changeUpIndex', target => {
+            this.updatePlayStyle(true);
+            this.songs[target].playing = false;
+        })
 
         // 监听音频播放状态变化
         this.audio.addEventListener('timeupdate', () => {
@@ -223,7 +218,7 @@ export default {
                 // 更换进度条小图标
                 this.$store.commit("saveMusicIcon", this.$store.state.musicList[index].icon_url)
                 this.updatePlayStyle(true);
-            } else {
+            } else if (this.$store.state.musicList == this.songs){
                 this.$notify({
                     title: '歌单已没有下一首歌曲',
                     message: '歌单已没有下一首歌曲',
@@ -296,7 +291,6 @@ export default {
     position: relative;
     background-color: transparent;
     border: none;
-    cursor: pointer;
     right: 80px;
     transition: transform 0.3s;
 }

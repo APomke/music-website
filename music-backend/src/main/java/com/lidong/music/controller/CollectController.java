@@ -87,12 +87,12 @@ public class CollectController {
 
     // 判断用户是否收藏指定音乐
     @GetMapping("/isCollect")
-    public ResponseVO isCollect(String music_title,HttpSession session) {
+    public ResponseVO isCollect(String title,HttpSession session) {
         ResponseVO responseVO = new ResponseVO();
-        System.out.println("获取的音乐为：" + music_title);
+        System.out.println("获取的音乐为：" + title);
         // 从 session 中获取用户信息
         User userInfo = (User) session.getAttribute("userInfo");
-        if (collectService.isCollect(music_title,userInfo.getUid())) {
+        if (collectService.isCollect(title,userInfo.getUid())) {
             responseVO.setCode(200);
             responseVO.setInfo("音乐已被收藏");
         }else {
