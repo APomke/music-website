@@ -91,19 +91,28 @@ export default {
                         message: response.data.info
                     });
                 } else {
-                    this.userInfo = response.data.data
-                    // 将返回的用户信息保存到 sessionStorage
-                    sessionStorage.setItem('userInfo', JSON.stringify(response.data.data));
-                    // 把用户信息保存到vuex
-                    // this.$store.commit("saveUserInfo", this.userInfo)
+                    const jwt = response.data.data
+                    // 将返回的jwt保存到 sessionStorage
+                    sessionStorage.setItem('jwt', JSON.stringify(response.data.data));
                     // 关闭模态框
                     this.showLoginModal = false;
 
-                    this.$notify({
-                        title: '登录成功',
-                        message: "登录成功",
-                        type: 'success'
-                    });
+                    // 通过jwt获取用户信息
+                    userapi.getUserInfo().then(response => {
+                        if (response.data.code == 403) {
+                            this.$notify.error({
+                                title: '获取用户信息失败',
+                                message: response.data.info
+                            });
+                        } else {
+                            this.userInfo = response.data.data;
+                            this.$notify({
+                                title: '登录成功',
+                                message: "登录成功",
+                                type: 'success'
+                            });
+                        }
+                    })
                 }
 
             }).catch(error => {
@@ -122,12 +131,24 @@ export default {
     },
     created() {
         // console.log(this.$store.state.tableroute[0].isIndex)
-        const savedUserInfo = sessionStorage.getItem('userInfo');
-        if (savedUserInfo) {
-            this.userInfo = JSON.parse(savedUserInfo);
-            // 把用户信息保存到vuex
-            // this.$store.commit("saveUserInfo", this.userInfo)
-            // console.log('从 sessionStorage 读取用户信息:', this.userInfo);
+        const jwt = sessionStorage.getItem('jwt');
+        if (jwt) {
+            // 通过jwt获取用户信息
+            userapi.getUserInfo().then(response => {
+                if (response.data.code == 403) {
+                    this.$notify.error({
+                        title: '获取用户信息失败',
+                        message: response.data.info
+                    });
+                } else {
+                    this.userInfo = response.data.data;
+                    // this.$notify({
+                    //     title: '登录成功',
+                    //     message: "登录成功",
+                    //     type: 'success'
+                    // });
+                }
+            })
         }
     },
     mounted() {

@@ -6,7 +6,9 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-
+      url: jdbc:mysql://103.151.216.34:3306/music?serverTimezone=UTC
+      username: root
+      password: 311252
 mybatis-plus:
   configuration:
     #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射

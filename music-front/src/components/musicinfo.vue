@@ -167,8 +167,8 @@ export default {
         collect() {
             // console.log("点击了收藏按钮")
             // 判断用户是否登录
-            const savedUserInfo = sessionStorage.getItem('userInfo');
-            if (savedUserInfo) {
+            const jwt = sessionStorage.getItem('jwt');
+            if (jwt) {
                 // console.log("当前页面音乐id为:",this.$store.state.music)
                 collectapi.collect_music(this.$store.state.music).then(response => {
                     // console.log(response);
@@ -206,8 +206,9 @@ export default {
             console.log("未获取到音乐信息,显示默认视图")
         }
         // 判断用户是否登入登入
-        const savedUserInfo = sessionStorage.getItem('userInfo');
-        if (savedUserInfo) {
+        const jwt = sessionStorage.getItem('jwt');
+        if (jwt) {
+            // 获取用户信息并且判断是否收藏该歌曲
             this.handleIsCollect();
         }
     },

@@ -119,7 +119,7 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect> impl
     @Override
     public boolean unCollect(String title, String uid) {
         QueryWrapper<Collect> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("music_title",title).eq("uid",uid);
+        queryWrapper.eq("title",title).eq("uid",uid);
         return collectMapper.delete(queryWrapper) > 0;
     }
 

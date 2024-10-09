@@ -2,19 +2,25 @@
 package com.lidong.music.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.lidong.music.entity.Collect;
 import com.lidong.music.entity.Music;
 import com.lidong.music.entity.User;
 import com.lidong.music.service.CollectService;
 import com.lidong.music.entity.ResponseVO;
+import com.lidong.music.utils.JwtTools;
 import com.lidong.music.utils.StringTools;
 import com.mysql.cj.util.StringUtils;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
+
+import static com.lidong.music.utils.JwtTools.objectMapper;
 
 @RestController
 @RequestMapping("/collect")
@@ -55,19 +61,25 @@ public class CollectController {
     }
     // 收藏音乐
     @PostMapping("/CollectMusic")
-    public ResponseVO collectMusic(HttpSession session, @RequestBody Music music) {
+    public ResponseVO collectMusic(HttpServletRequest request,HttpSession session, @RequestBody Music music) throws JsonProcessingException {
         ResponseVO responseVO = new ResponseVO();
         // 把music对象转为collect对象
 
-        // 通过session获取uid
-        // 从 session 中获取用户信息
-        User userInfo = (User) session.getAttribute("userInfo");
-//        System.out.println("获取的用户信息为：" + userInfo.toString());
+        // 从请求头中获取 JWT，并验证
+        String header = request.getHeader("Authorization");
+        String token = header.substring(7).replaceAll("^\"|\"$", ""); // 去除首尾双引号
+        System.out.println("获取的jwt:" + token);
+        // 验证 JWT
+        Claims claims = JwtTools.validateToken(token);
+        // uid 存储在 userJson 中
+        JsonNode userNode = objectMapper.readTree(claims.getSubject());
+        String uid = userNode.get("uid").asText();
+
         System.out.println("获取的音乐对象：" + music.toString());
 
         Collect collect = new Collect();
         collect.setId(StringTools.getRandomUUID());
-        collect.setUid(userInfo.getUid());
+        collect.setUid(uid);
         collect.setTitle(music.getTitle());
         collect.setUrl(music.getUrl());
         collect.setMusic_artist(music.getArtist());
@@ -87,12 +99,23 @@ public class CollectController {
 
     // 判断用户是否收藏指定音乐
     @GetMapping("/isCollect")
-    public ResponseVO isCollect(String title,HttpSession session) {
+    public ResponseVO isCollect(HttpServletRequest request,String title) throws JsonProcessingException {
         ResponseVO responseVO = new ResponseVO();
-        System.out.println("获取的音乐为：" + title);
-        // 从 session 中获取用户信息
-        User userInfo = (User) session.getAttribute("userInfo");
-        if (collectService.isCollect(title,userInfo.getUid())) {
+//        System.out.println("获取的音乐为：" + title);
+
+        // 从请求头中获取 JWT，并验证
+        String header = request.getHeader("Authorization");
+        String token = header.substring(7).replaceAll("^\"|\"$", ""); // 去除首尾双引号
+        System.out.println("获取的jwt:" + token);
+        // 验证 JWT
+        Claims claims = JwtTools.validateToken(token);
+        // uid 存储在 userJson 中
+        JsonNode userNode = objectMapper.readTree(claims.getSubject());
+        String uid = userNode.get("uid").asText();
+//        System.out.println("获取的uid为："+uid);
+
+
+        if (collectService.isCollect(title,uid)) {
             responseVO.setCode(200);
             responseVO.setInfo("音乐已被收藏");
         }else {
@@ -103,10 +126,21 @@ public class CollectController {
     }
     // 取消收藏指定音乐
     @GetMapping("/unCollect")
-    public ResponseVO unCollect(String music_title,HttpSession session) {
+    public ResponseVO unCollect(HttpServletRequest request,String music_title,HttpSession session) throws JsonProcessingException {
         ResponseVO responseVO = new ResponseVO();
         User userInfo = (User) session.getAttribute("userInfo");
-        if (collectService.unCollect(music_title,userInfo.getUid())) {
+
+        String header = request.getHeader("Authorization");
+        String token = header.substring(7).replaceAll("^\"|\"$", ""); // 去除首尾双引号
+        System.out.println("获取的jwt:" + token);
+        // 验证 JWT
+        Claims claims = JwtTools.validateToken(token);
+        // uid 存储在 userJson 中
+        JsonNode userNode = objectMapper.readTree(claims.getSubject());
+
+        String uid = userNode.get("uid").asText();
+
+        if (collectService.unCollect(music_title,uid)) {
             responseVO.setCode(200);
         }else {
             responseVO.setCode(500);
