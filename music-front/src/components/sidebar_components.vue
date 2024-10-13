@@ -32,14 +32,16 @@ export default {
                 var tableroute = [
                     { isIndex: false },
                     { isMusicInfo: true },
-                    { isCcollect: false}
+                    { isCcollect: false},
+                    {isUpload: false}
                 ]
                 this.$store.commit("saveTableRoute", tableroute)
             } else if(option == "推荐") {
                 var tableroute = [
                     { isIndex: true },
                     { isMusicInfo: false },
-                    { isCcollect: false}
+                    { isCcollect: false},
+                    {isUpload: false}
                 ]
                 this.$store.commit("saveTableRoute", tableroute)
             } else if(option == "收藏"){
@@ -47,10 +49,21 @@ export default {
                 var tableroute = [
                     { isIndex: false },
                     { isMusicInfo: false },
-                    { isCcollect: true}
+                    { isCcollect: true},
+                    {isUpload: false}
+                ]
+                this.$store.commit("saveTableRoute", tableroute)
+            }else if(option == "上传"){
+                // console.log("点击了上传页面")
+                var tableroute = [
+                    { isIndex: false },
+                    { isMusicInfo: false },
+                    { isCcollect: false},
+                    {isUpload: true}
                 ]
                 this.$store.commit("saveTableRoute", tableroute)
             }
+            
             // 这里可以添加更多的逻辑，比如根据选项进行路由跳转或显示不同的内容等  
         }
     }

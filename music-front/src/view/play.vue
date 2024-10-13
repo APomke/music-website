@@ -42,6 +42,9 @@
         <div class="layout-right" v-if="this.$store.state.tableroute[2].isCcollect">
             <musiccollect />
         </div>
+        <div class="layout-right" v-if="this.$store.state.tableroute[3].isUpload">
+            <upload />
+        </div>
         <div class="layout-under">
             <progressbar />
         </div>
@@ -56,6 +59,8 @@ import recommendations from '../components/recommendations.vue'
 import progressbar from '../components/progressbar.vue'
 import musicinfo from '../components/musicinfo.vue'
 import musiccollect from '../components/musiccollect.vue'
+import upload from '../components/upload.vue'
+
 import userapi from '@/api/user'
 
 
@@ -66,7 +71,8 @@ export default {
         recommendations,
         progressbar,
         musicinfo,
-        musiccollect
+        musiccollect,
+        upload
     },
     data() {
         return {
@@ -122,8 +128,8 @@ export default {
         },
         logout() {
             // 清除 userInfo
-            sessionStorage.removeItem('userInfo');
-            this.$store.commit("saveUserInfo", null);
+            sessionStorage.removeItem('jwt');
+            this.$store.commit("jwt", null);
             // 重新加载网页或者让页面动态刷新
             // 重新加载网页
             location.reload();

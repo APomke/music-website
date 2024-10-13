@@ -1,23 +1,37 @@
 
 package com.lidong.music.controller;
 
+import com.alibaba.fastjson2.JSONObject;
+import com.aliyun.oss.OSSClient;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lidong.music.entity.Music;
 import com.lidong.music.service.MusicService;
 import com.lidong.music.entity.ResponseVO;
+import com.lidong.music.utils.OssTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
 @CrossOrigin
 public class MusicController {
 
+//    @Autowired
+//    private MusicService musicService;
+
+    private static final Logger logger = LoggerFactory.getLogger(MusicController.class);
+
+    private final MusicService musicService;
+    private final OssTools ossTools;
+
     @Autowired
-    private MusicService musicService;
+    public MusicController(MusicService musicService, OssTools ossTools) {
+        this.musicService = musicService;
+        this.ossTools = ossTools;
+    }
     
     // 查询
 
@@ -165,13 +179,33 @@ public class MusicController {
         
     }
     // 增加
-    @PostMapping("/addMusic")
-    public ResponseVO addMusic(Music music) {
+    @PostMapping("/music/addMusic")
+    public ResponseVO addMusic(@RequestBody Music music) {
         ResponseVO responseVO = new ResponseVO();
-        int i = musicService.addMusic(music);
-        responseVO.setCode(200);
-        responseVO.setInfo("增加成功！");
-        responseVO.setStatus("success");
+
+        try {
+            // 调用音乐服务添加音乐
+//            int result = musicService.addMusic(music);
+
+            if (true) {
+                // 获取OSS临时上传凭证
+                JSONObject signature = ossTools.getSignature(music.getTitle());
+                responseVO.setCode(200);
+                responseVO.setInfo("增加成功！");
+                responseVO.setStatus("success");
+                responseVO.setData(signature);
+            } else {
+                responseVO.setCode(500);
+                responseVO.setInfo("音乐添加失败！");
+                responseVO.setStatus("error");
+            }
+        } catch (Exception e) {
+            logger.error("Failed to add music: {}", e.getMessage(), e);
+            responseVO.setCode(500);
+            responseVO.setInfo("系统错误，请稍后再试！");
+            responseVO.setStatus("error");
+        }
+
         return responseVO;
     }
     // 删除

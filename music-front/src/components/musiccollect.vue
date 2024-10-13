@@ -45,43 +45,45 @@
 <script>
 import collectapi from '@/api/collect'
 import eventBus from '@/utils/eventBus';
+import userapi from '@/api/user'
 export default {
     data() {
         return {
             songs: [],
             audio: new Audio(),
             isLoding: false,
+            uid: null
         }
     },
     methods: {
         // 发送请求，获取用户收藏数据
         async handleGetCollectList() {
-            const savedUserInfo = sessionStorage.getItem('userInfo');
-            if (savedUserInfo) {
-                // 从session里取出用户uid
-                const uid = JSON.parse(savedUserInfo).uid;
-                // console.log(uid)
-                await collectapi.get_collect(uid).then(response => {
-                    this.songs = response.data.data;
-                    // console.log(response);
-                    // 为每个song添加一个playing字段默认为false
-                    // 使用 map 函数遍历数组并返回新的数组
-                    this.songs = this.songs.map(song => ({
-                        ...song, // 复制原有对象
-                        playing: false // 添加新的字段
-                    }));
-                    this.initPlay();
-                    this.isLoding = true;
-                }).catch(error => {
-                    console.error(error);
-                });
-            } else {
-                this.$notify({
-                    title: '请先登录',
-                    message: '请先登录',
-                    type: 'warning'
-                });
-            }
+            // 通过jwt获取用户信息
+            userapi.getUserInfo().then(async response => {
+                if (response.data.code == 403) {
+                    this.$notify.error({
+                        title: '获取用户信息失败',
+                        message: response.data.info
+                    });
+                } else {
+                    this.uid = response.data.data.uid;
+                    console.log("uid赋值成功", this.uid)
+                    await collectapi.get_collect(this.uid).then(response => {
+                        this.songs = response.data.data;
+                        // console.log(response);
+                        // 为每个song添加一个playing字段默认为false
+                        // 使用 map 函数遍历数组并返回新的数组
+                        this.songs = this.songs.map(song => ({
+                            ...song, // 复制原有对象
+                            playing: false // 添加新的字段
+                        }));
+                        this.initPlay();
+                        this.isLoding = true;
+                    }).catch(error => {
+                        console.error(error);
+                    });
+                }
+            })
         },
         playSong(id) {
             // 这里可以调用播放歌曲的方法或者API
@@ -148,7 +150,17 @@ export default {
     },
     created() {
         this.audio = this.$store.state.audio;
-        this.handleGetCollectList();
+        const jwt = sessionStorage.getItem('jwt');
+        // 如果用户已经登录
+        if (jwt) {
+            this.handleGetCollectList();
+        } else {
+            this.$notify({
+                title: '请先登录',
+                message: '请先登录',
+                type: 'warning'
+            });
+        }
     },
     watch: {
         // 全局播放状态
@@ -218,7 +230,7 @@ export default {
                 // 更换进度条小图标
                 this.$store.commit("saveMusicIcon", this.$store.state.musicList[index].icon_url)
                 this.updatePlayStyle(true);
-            } else if (this.$store.state.musicList == this.songs){
+            } else if (this.$store.state.musicList == this.songs) {
                 this.$notify({
                     title: '歌单已没有下一首歌曲',
                     message: '歌单已没有下一首歌曲',
@@ -234,7 +246,7 @@ export default {
         } else {
             // 如果当前歌单不是收藏歌单
             // 卸载音频结束监听器
-            this.audio.removeEventListener('ended',this.handleAudioEnd);
+            this.audio.removeEventListener('ended', this.handleAudioEnd);
         }
     }
 }

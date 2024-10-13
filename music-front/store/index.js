@@ -10,7 +10,8 @@ export default new Vuex.Store({
         tableroute: [
             {isIndex: true},
             {isMusicInfo: false},
-            {isCcollect: false}
+            {isCcollect: false},
+            {isUpload: false}
         ],
         // 播放按钮状态
         playstatus: false,
