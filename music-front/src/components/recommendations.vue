@@ -89,11 +89,14 @@ export default {
                 this.$store.commit("saveCurrentTime", 0)
                 // 设置播放时长
                 this.duration = this.formatTime(this.audio.duration)
+                // 把推荐歌单保存到vux的当前歌单里
+                this.$store.commit("saveMusicList", this.recommendations);
             }
             var tableroute = [
                 { isIndex: false },
                 { isMusicInfo: true },
-                { isCcollect: false }
+                { isCcollect: false },
+                { isUpload: false}
             ]
             this.$store.commit("saveTableRoute", tableroute)
         },

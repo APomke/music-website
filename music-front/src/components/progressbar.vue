@@ -185,6 +185,7 @@ export default {
         async nextbutton() {
             console.log("点击了下一首按钮")
             // 播放下一首
+            console.log(this.$store.state.musicid);
             const currentIndex = this.$store.state.musicList.findIndex(item => item.id === this.$store.state.musicid);
             let index = parseInt(currentIndex + 1);
             if (this.$store.state.musicList[index]) {

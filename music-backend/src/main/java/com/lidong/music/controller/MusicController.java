@@ -4,6 +4,7 @@ package com.lidong.music.controller;
 import com.alibaba.fastjson2.JSONObject;
 import com.aliyun.oss.OSSClient;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.lidong.music.config.OssConfig;
 import com.lidong.music.entity.Music;
 import com.lidong.music.service.MusicService;
 import com.lidong.music.entity.ResponseVO;
@@ -27,10 +28,13 @@ public class MusicController {
     private final MusicService musicService;
     private final OssTools ossTools;
 
+    private final OssConfig ossConfig;
+
     @Autowired
-    public MusicController(MusicService musicService, OssTools ossTools) {
+    public MusicController(MusicService musicService, OssTools ossTools, OssConfig ossConfig) {
         this.musicService = musicService;
         this.ossTools = ossTools;
+        this.ossConfig = ossConfig;
     }
     
     // 查询
@@ -180,14 +184,21 @@ public class MusicController {
     }
     // 增加
     @PostMapping("/music/addMusic")
-    public ResponseVO addMusic(@RequestBody Music music) {
+    public ResponseVO addMusic(@RequestBody Music music,@RequestParam(value = "fileName", required = false) String fileName,
+                               @RequestParam(value = "iconFileName", required = false) String iconFileName) {
         ResponseVO responseVO = new ResponseVO();
 
         try {
+            // 拼接音乐文件ossurl
+            String url = "https://" + ossConfig.getBucket() + "." + ossConfig.getEndpoint() + '/' + music.getTitle() + '/' + fileName;
+            // 拼接icon url
+            String iconUrl  = "https://" + ossConfig.getBucket() + "." + ossConfig.getEndpoint() + '/' + music.getTitle() + '/' + iconFileName;
+            music.setUrl(url);
+            music.setIcon_url(iconUrl);
             // 调用音乐服务添加音乐
-//            int result = musicService.addMusic(music);
+            int result = musicService.addMusic(music);
 
-            if (true) {
+            if (result > 0) {
                 // 获取OSS临时上传凭证
                 JSONObject signature = ossTools.getSignature(music.getTitle());
                 responseVO.setCode(200);

@@ -32,7 +32,7 @@ export default {
     return apiClient.get(`/music/recommendations`);
   },
   // 上传音乐
-  uploadMusic(data) {
-    return apiClient.post(`/music/addMusic`, data);
+  uploadMusic(data,fileName,iconFileName) {
+    return apiClient.post(`/music/addMusic?fileName=${encodeURIComponent(fileName)}&iconFileName=${encodeURIComponent(iconFileName)}`, data);
   }
 }

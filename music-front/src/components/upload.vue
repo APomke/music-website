@@ -1,5 +1,6 @@
 <template>
-    <div class="upload-container">
+    <div class="upload-container" v-loading="loading" element-loading-text="正在上传中，请勿关闭网页"
+        element-loading-spinner="el-icon-loading">
         <div class="upload-form">
             <el-form :model="form" ref="formRef" :rules="rules" label-position="top">
                 <el-form-item prop="title">
@@ -62,6 +63,11 @@ export default {
             isUploadDisabled: false, // 控制上传按钮是否禁用
             uid: null,
             audio: new Audio(),
+            file: null,
+            fileName: null,
+            iconfile: null,
+            iconFileName: null,
+            loading: false,
         };
     },
     methods: {
@@ -77,16 +83,44 @@ export default {
         },
         handleCoverChange(file, fileList) {
             // 当封面发生变化时，记录最新的文件信息
+            this.iconfile = file.raw;
+
             this.fileList = fileList;
+            this.iconFileName = file.name;
             this.form.coverFileName = file.name;
         },
         beforeUploadMusic(file) {
+            this.file = file.raw;
+            this.fileName = file.name;
             this.musicFiles.push(file.name); // 记录音乐文件名
             this.isUploadDisabled = true; // 文件上传后禁用上传组件
             this.filesize = file.size / 1024 / 1024
         },
+        async uploadFileToOSS(uploadData, file) {
+            const formData = new FormData();
+            formData.append('key', `${uploadData.dir}/${file.name}`); // 上传路径和文件名
+            formData.append('OSSAccessKeyId', uploadData.accessid);
+            formData.append('policy', uploadData.policy);
+            formData.append('signature', uploadData.signature);
+            formData.append('success_action_status', '200'); // 成功状态码
+            formData.append('file', file); // 文件对象
+
+            const response = await fetch(uploadData.host, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.status === 200 || response.status === 204) { // 根据OSS文档，可能是200或204
+                // 构建文件的访问URL
+                return Promise.resolve({ success: true }); // 上传成功
+            } else {
+                return Promise.reject(new Error('Failed to upload file.')); // 上传失败
+            }
+        },
         submitForm() {
             this.$refs.formRef.validate(valid => {
+                this.loading = true;
+
                 if (valid) {
                     var music = {
                         "title": this.form.title,
@@ -95,21 +129,37 @@ export default {
                         "upload_user_uid": this.uid
                     }
 
-                    console.log(music);
-
-                    musicapi.uploadMusic(music).then(response => {
-                        // console.log("判断音乐是否已被收藏", response)
+                    // console.log(music);
+                    // 上传音乐文件
+                    musicapi.uploadMusic(music, this.fileName,this.iconFileName).then(response => {
                         if (response.data.code == 200) {
-                            console.log(response.data.data);
+                            // 获取到临时上传凭证后开始上传
+                            const uploadData = response.data.data;
+
+                            // 假设 `this.file` 是你要上传的文件
+                            this.uploadFileToOSS(uploadData, this.file).then(() => {
+                                this.loading = false;
+                                console.log('音乐文件上传成功');
+                                this.$notify({
+                                    title: '音乐上传功',
+                                    message: "音乐上传成功",
+                                    type: 'success'
+                                });
+
+                            }).catch(error => {
+                                console.error('上传失败:', error);
+                                this.loading = false;
+                            });
+
+                            // 上传icon文件
+                            this.uploadFileToOSS(uploadData, this.iconfile).then(() => {
+                                console.log('封面上传成功');
+                            }).catch(error => {
+                                console.error('上传失败:', error);
+                            });
                         }
                     })
 
-
-                    // 手动上传封面文件
-                    // this.$refs.coverUpload.submit();
-
-                    // 手动上传音乐文件
-                    // this.$refs.musicUpload.submit();
 
                 } else {
                     console.log('表单验证失败');
@@ -132,6 +182,12 @@ export default {
                 }
             })
         },
+        // 把播放时间转换为00:00的结构
+        formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secondsLeft = Math.floor(seconds % 60);
+            return `${String(minutes).padStart(2, '0')}:${String(secondsLeft).padStart(2, '0')}`;
+        },
     },
     created() {
         this.audio = this.$store.state.audio;
@@ -146,6 +202,53 @@ export default {
                 type: 'warning'
             });
         }
+    },
+    watch: {
+        // 监控进度条播放按钮状态
+        "$store.state.music.playing": {
+            deep: true,//深度监听设置为 true
+            handler: function (newVal, oldVal) {
+                if (newVal) {
+                    //播放音乐
+                    this.$store.state.audio.play();
+                    // 修改vuex里的音乐状态
+                    this.$store.commit("updateMusicState", true)
+                } else {
+                    //暂停音乐
+                    this.$store.state.audio.pause();
+                    // 修改vuex里的音乐状态
+                    this.$store.commit("updateMusicState", false)
+                }
+            }
+        },
+        "$store.state.updateCurrentTime": {
+            deep: true,
+            handler: function (newVal, oldVal) {
+                if (newVal) {
+                    // 修改音乐播放进度
+                    // console.log("修改播放进度")
+                    this.audio.currentTime = newVal
+                    this.$store.commit("saveAudio", this.audio)
+                }
+            }
+        },
+
+    },
+    mounted() {
+
+        // 监听音频播放状态变化
+        this.audio.addEventListener('timeupdate', () => {
+            this.currentTime = this.formatTime(this.audio.currentTime);
+            // 保存到vux
+            this.$store.commit("saveCurrentTime", this.$store.state.audio.currentTime)
+            // console.log("当前音乐播放时间:", this.currentTime)
+        });
+
+        // 监听音频播放结束
+        this.audio.addEventListener('ended', () => {
+            console.log('音频播放结束');
+            this.currentTime = 0;
+        });
     },
 }
 </script>
